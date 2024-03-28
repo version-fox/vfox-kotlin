@@ -1,3 +1,6 @@
+local util = require("util")
+local http = require("http")
+
 --- Returns some pre-installed information, such as version number, download address, local files, etc.
 --- If checksum is provided, vfox will automatically check it for you.
 --- @param ctx table
@@ -5,36 +8,34 @@
 --- @return table Version information
 function PLUGIN:PreInstall(ctx)
     local version = ctx.version
-    local runtimeVersion = ctx.runtimeVersion
-    return {
-        --- Version number
-        version = "xxx",
-        --- remote URL or local file path [optional]
-        url = "xxx",
-        --- SHA256 checksum [optional]
-        sha256 = "xxx",
-        --- md5 checksum [optional]
-        md5 = "xxx",
-        --- sha1 checksum [optional]
-        sha1 = "xxx",
-        --- sha512 checksum [optional]
-        sha512 = "xx",
-        --- additional need files [optional]
-        addition = {
-            {
-                --- additional file name !
-                name = "xxx",
-                --- remote URL or local file path [optional]
-                url = "xxx",
-                --- SHA256 checksum [optional]
-                sha256 = "xxx",
-                --- md5 checksum [optional]
-                md5 = "xxx",
-                --- sha1 checksum [optional]
-                sha1 = "xxx",
-                --- sha512 checksum [optional]
-                sha512 = "xx",
-            }
+
+    if version == "latest" then
+        local lists = self:Available({})
+        version = lists[1].version
+    end
+    local url = util.DownloadURL:format(version, version)
+    local resp, err = http.head({
+        url = url
+    })
+    if err ~= nil or resp.status_code ~= 200 then
+        error("Current version information not detected.")
+    end
+    if util:compare_versions({ version = version },{version = "1.9.0"}) or version=="1.9.0" then
+        resp, err = http.get({
+            url = url .. ".sha256"
+        })
+        if err ~= nil or resp.status_code ~= 200 then
+            error("Current version checksum not detected.")
+        end
+        return {
+            version = version,
+            url = url,
+            sha256 = resp.body
         }
-    }
+    else
+        return {
+            version = version,
+            url = url
+        }
+    end
 end
