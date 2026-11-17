@@ -50,10 +50,18 @@ vfox loads `metadata.lua`, calls a hook when a command needs it, and puts
   the answer is 200. For a version at or above 1.9.0 it GETs `<url>.sha256` and
   returns its body as `sha256`; otherwise it returns no checksum. `version` in
   the result is the name vfox installs under, which is why `latest` is resolved
-  to a concrete release here.
-- `EnvKeys` returns `{ key = "PATH", value = ctx.path .. "/bin" }`. vfox strips
-  the top-level `kotlinc` directory of the archive, so the launchers sit
-  directly in `<sdk>/bin`.
+  to a concrete release here. It also probes the per-platform Kotlin/Native
+  asset from `lib/util.lua`; when the HEAD request succeeds, the archive is
+  returned in `addition` (with its own `.sha256` when one exists), so vfox
+  downloads and extracts it as a second package. An absent native asset only
+  leaves out `kotlinc-native`; the compiler still installs.
+- `EnvKeys` returns `{ key = "PATH", value = ctx.path .. "/bin" }` and one more
+  PATH entry for every non-main package in `ctx.sdkInfo`. vfox strips the
+  top-level `kotlinc` directory of the archive, so the launchers sit directly
+  in `<sdk>/bin`, and the Kotlin/Native addition's `bin` holds
+  `kotlinc-native`, `konanc` and `klib`. vfox keys additions by their runtime
+  directory name (`add-native-<version>`), not by the `name` sent in
+  `PreInstall`.
 - `PreUse` and `PostInstall` are no-ops; vfox matches an installed version and
   applies `EnvKeys` without help from the plugin.
 - `Detect` scans SDKMAN, asdf, mise, Homebrew, IDE bundles, the system

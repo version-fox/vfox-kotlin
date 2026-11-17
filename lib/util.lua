@@ -16,6 +16,71 @@ local util = {}
 
 util.DownloadURL = "https://github.com/JetBrains/kotlin/releases/download/v%s/kotlin-compiler-%s.zip"
 
+-- Kotlin/Native is published as a separate archive next to the compiler.
+-- JetBrains only builds it for these host platforms; anything else (Linux
+-- arm64 for example) falls back to the compiler-only install.
+local NATIVE_PLATFORMS = {
+    linux = {
+        amd64 = "linux-x86_64",
+    },
+    darwin = {
+        amd64 = "macos-x86_64",
+        arm64 = "macos-aarch64",
+    },
+    windows = {
+        amd64 = "windows-x86_64",
+    },
+}
+
+--- Return the Kotlin/Native platform token and archive extension for a
+--- runtime's OS and architecture, or nil when no prebuilt compiler exists.
+--- @param osType string RUNTIME.osType (linux, darwin, windows)
+--- @param archType string RUNTIME.archType (amd64, arm64)
+--- @return string|nil platform
+--- @return string|nil extension
+function util:NativePlatform(osType, archType)
+    local byArch = NATIVE_PLATFORMS[osType]
+    if byArch == nil then
+        return nil, nil
+    end
+    local platform = byArch[archType]
+    if platform == nil then
+        return nil, nil
+    end
+    local extension = "tar.gz"
+    if osType == "windows" then
+        extension = "zip"
+    end
+    return platform, extension
+end
+
+--- URL of the Kotlin/Native prebuilt archive for a release. Kotlin 2.0
+--- renamed the asset from kotlin-native-<platform>-<version> to
+--- kotlin-native-prebuilt-<platform>-<version>; the canonical name is the
+--- one that carries a .sha256 file.
+--- @param version string Kotlin release
+--- @param osType string RUNTIME.osType
+--- @param archType string RUNTIME.archType
+--- @return string|nil url
+function util:NativeDownloadURL(version, osType, archType)
+    local platform, extension = self:NativePlatform(osType, archType)
+    if platform == nil then
+        return nil
+    end
+    local prefix = "kotlin-native-"
+    if self:compare_versions({ version = version }, { version = "2.0.0" }) or version == "2.0.0" then
+        prefix = "kotlin-native-prebuilt-"
+    end
+    return string.format(
+        "https://github.com/JetBrains/kotlin/releases/download/v%s/%s%s-%s.%s",
+        version,
+        prefix,
+        platform,
+        version,
+        extension
+    )
+end
+
 function util:compare_versions(v1o, v2o)
     local v1 = v1o.version
     local v2 = v2o.version

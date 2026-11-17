@@ -5,7 +5,8 @@
 [vfox](https://vfox.dev/) 的 Kotlin 插件。
 
 它从 [JetBrains 的发布页](https://github.com/JetBrains/kotlin/releases) 安装
-Kotlin 编译器并加入 `PATH`。从 1.9.0 起，安装时会用 JetBrains 同时发布的
+Kotlin 编译器并加入 `PATH`；当 JetBrains 为你的平台提供预编译包时，也会一并安装
+Kotlin/Native（`kotlinc-native`）。从 1.9.0 起，安装时会用 JetBrains 同时发布的
 `.sha256` 文件校验下载。
 
 ## 安装
@@ -36,6 +37,21 @@ vfox use --global kotlin@2.1.0 # 所有新 shell
 ```
 
 详见 [versions.md](docs/zh-CN/versions.md)，包括 1.9.0 之前版本的校验行为。
+
+## Kotlin/Native
+
+Kotlin/Native 作为单独的发布资源提供。从 1.9.0 起，插件会下载适用于 Linux x86_64、
+macOS x86_64/arm64 或 Windows x86_64 的预编译编译器，并把它的 `bin` 目录与 JVM 编译器
+一起加入 `PATH`：
+
+```bash
+kotlinc-native -version
+kotlinc-native hello.kt -o hello
+```
+
+当 JetBrains 提供 `.sha256` 时，原生归档包会用该文件单独校验。在没有预编译原生
+编译器的主机上（例如 Linux arm64）仍可正常安装 JVM 编译器。附带原生编译器需要
+vfox 1.0.0 或更新版本，并且和 `kotlinc` 一样需要 `PATH` 上有 Java 运行时。
 
 ## 运行要求
 

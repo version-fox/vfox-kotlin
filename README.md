@@ -5,8 +5,9 @@
 Kotlin plugin for [vfox](https://vfox.dev/).
 
 It installs the Kotlin compiler from [JetBrains' releases](https://github.com/JetBrains/kotlin/releases)
-onto your `PATH`. Releases from 1.9.0 on are verified against the `.sha256`
-file JetBrains publishes beside the archive.
+onto your `PATH`, together with Kotlin/Native (`kotlinc-native`) when JetBrains
+publishes a prebuilt native compiler for your platform. Releases from 1.9.0 on
+are verified against the `.sha256` files JetBrains publishes beside the archives.
 
 ## Install
 
@@ -40,6 +41,23 @@ vfox use --global kotlin@2.1.0 # every new shell
 
 See [versions.md](docs/versions.md) for details, including the checksum
 behaviour of releases before 1.9.0.
+
+## Kotlin/Native
+
+Kotlin/Native ships as a separate release asset. For releases from 1.9.0 on,
+the plugin downloads the prebuilt compiler for Linux x86_64, macOS x86_64/arm64
+or Windows x86_64 and puts its `bin` directory on `PATH` next to the JVM
+compiler:
+
+```bash
+kotlinc-native -version
+kotlinc-native hello.kt -o hello
+```
+
+The native archive is verified against its own `.sha256` when JetBrains
+publishes one. On hosts without a prebuilt native compiler (Linux arm64, for
+example) the JVM compiler still installs. Bundling the native compiler needs
+vfox 1.0.0 or later and, like `kotlinc`, a Java runtime on `PATH`.
 
 ## Requirements
 

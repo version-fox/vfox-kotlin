@@ -6,6 +6,7 @@
 
 ## 未发布
 
+- 将 Kotlin/Native 与 JVM 编译器一起安装。`PreInstall` 在有预编译归档包的主机上把 JetBrains 的原生编译器作为附加包下载，`EnvKeys` 把它的 `bin` 目录加入 `PATH`，于是 `kotlinc-native`、`konanc` 和 `klib` 与 `kotlinc` 一同可用。资源名称随版本选择（Kotlin 2.0 起有变化），并在 JetBrains 发布 `.sha256` 时单独校验。需要 vfox 1.0.0 或更新版本；没有原生编译包的主机仍可正常安装 JVM 编译器。Linux 和 Windows 的 E2E 套件现在会检查 `kotlinc-native -version`。
 - 中英文 README 和文档，涵盖版本、从源码安装、开发、E2E、疑难解答以及本更新日志。
 - `Available`、`PreInstall`、`EnvKeys` 和版本辅助函数的离线 hook 测试，由 **Test Plugin** 工作流中的 `vfox plugin test` 运行。
 - Linux（Ubuntu 容器）和 Windows（Windows 容器）的 E2E 套件，各有对应的 GitHub Actions 工作流。它们安装固定版本的 vfox，从本仓库添加插件，安装编译器并检查 PATH 和版本输出。

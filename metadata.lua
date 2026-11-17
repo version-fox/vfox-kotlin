@@ -34,7 +34,10 @@ NOTE:
     If the plugin is not compatible with the current vfox version,
     vfox will not load the plugin and prompt the user to upgrade vfox.
  --]]
-PLUGIN.minRuntimeVersion = "0.3.0"
+-- The Kotlin/Native compiler is installed as a PreInstall `addition`, which
+-- vfox gained in 1.0.0; older runtimes would silently install only the JVM
+-- compiler and leave kotlinc-native missing.
+PLUGIN.minRuntimeVersion = "1.0.0"
 --[[
 NOTE:
     If configured, vfox will check for updates to the plugin at this address,

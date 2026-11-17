@@ -24,4 +24,24 @@ assert(result[1].value == "/sdks/kotlin/2.0.0/bin", "EnvKeys must add the SDK's 
 local spaced = plugin:EnvKeys({ path = "/sdks/My Kotlin/2.0.0" })
 assert(spaced[1].value == "/sdks/My Kotlin/2.0.0/bin", "EnvKeys must preserve spaces in the path")
 
-print("PASS: EnvKeys adds the SDK bin to PATH")
+-- An installed Kotlin/Native addition contributes its own bin directory, so
+-- kotlinc-native is on PATH next to kotlinc.
+local withNative = plugin:EnvKeys({
+    path = "/sdks/kotlin/2.0.0",
+    sdkInfo = {
+        kotlin = { name = "kotlin", version = "2.0.0", path = "/sdks/kotlin/2.0.0" },
+        ["add-native"] = { name = "add-native", version = "2.0.0", path = "/sdks/kotlin/add-native-2.0.0" },
+    },
+})
+assert(#withNative == 2, "EnvKeys must return a second PATH entry for Kotlin/Native")
+assert(withNative[2].key == "PATH", "the native entry must also extend PATH")
+assert(withNative[2].value == "/sdks/kotlin/add-native-2.0.0/bin", "EnvKeys must add the native bin directory to PATH")
+
+-- Linked installs and releases without a native build have no such addition.
+local withoutNative = plugin:EnvKeys({
+    path = "/sdks/kotlin/2.0.0",
+    sdkInfo = { kotlin = { name = "kotlin", version = "2.0.0", path = "/sdks/kotlin/2.0.0" } },
+})
+assert(#withoutNative == 1, "EnvKeys must not add a PATH entry without a native SDK")
+
+print("PASS: EnvKeys adds the SDK bin (and native bin) to PATH")

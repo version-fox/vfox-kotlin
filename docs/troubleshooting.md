@@ -10,6 +10,16 @@ shell hook. Run `vfox init` once and restart the shell, or follow the
 check that a version is selected with `vfox current kotlin` and that the
 variables are exported with `vfox env -s bash` (or your shell).
 
+## `kotlinc-native: command not found`
+
+Kotlin/Native is a separate release asset and is only bundled when JetBrains
+publishes a prebuilt compiler for your host (Linux x86_64, macOS x86_64/arm64
+and Windows x86_64 from 1.9.0 on; there is no Linux arm64 build). If `kotlinc`
+works but `kotlinc-native` does not, check `vfox --version`: bundling needs vfox
+1.0.0 or later, so upgrade and reinstall the release. Versions before 1.9.0
+have no Kotlin/Native archive at all; see [versions.md](versions.md#kotlinnative)
+for the full platform list.
+
 ## `java: command not found` when running kotlinc
 
 `kotlinc` and `kotlin` are JVM launchers; the plugin does not install Java.

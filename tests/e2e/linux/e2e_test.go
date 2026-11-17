@@ -93,6 +93,9 @@ func TestE2E(t *testing.T) {
 	checkMissingVersionRejected(ctx, t, ctr)
 	useKotlin(ctx, t, ctr, common.Version())
 	verifyToolchain(ctx, t, ctr, common.Version())
+	if common.HasNative(common.Version(), arch) {
+		verifyNative(ctx, t, ctr, common.Version())
+	}
 	checkDetect(ctx, t, ctr)
 
 	// The pre-1.9.0 branch of PreInstall has no checksum asset.

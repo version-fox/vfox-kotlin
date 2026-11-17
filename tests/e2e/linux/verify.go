@@ -74,6 +74,19 @@ func verifyToolchain(ctx context.Context, t *testing.T, ctr tc.Container, versio
 	t.Logf("PASS: kotlin %s runs from %s", version, binDir)
 }
 
+// verifyNative checks that the Kotlin/Native package downloaded as a
+// PreInstall addition is on PATH and reports the installed release.
+func verifyNative(ctx context.Context, t *testing.T, ctr tc.Container, version string) {
+	t.Helper()
+
+	native := strings.TrimSpace(common.StripANSI(execOK(ctx, t, ctr, activated("command -v kotlinc-native"))))
+	require.Containsf(t, native, "/bin/kotlinc-native", "kotlinc-native must be on PATH\n--- output ---\n%s", native)
+
+	banner := common.StripANSI(execOK(ctx, t, ctr, activated("kotlinc-native -version")))
+	require.Containsf(t, banner, version, "kotlinc-native -version must report %s\n--- output ---\n%s", version, banner)
+	t.Logf("PASS: kotlinc-native %s is on PATH", version)
+}
+
 // checkMissingVersionRejected asserts PreInstall's HEAD check rejects a
 // release JetBrains never published.
 func checkMissingVersionRejected(ctx context.Context, t *testing.T, ctr tc.Container) {
