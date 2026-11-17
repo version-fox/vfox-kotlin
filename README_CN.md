@@ -53,13 +53,14 @@ vfox link --detect kotlin
 
 这需要 vfox 1.1.0 或更新版本。vfox 会列出插件找到的编译器并让你选择；
 `vfox link --detect -y kotlin` 会不问确认地全部纳入。详见
-[versions.md](docs/zh-CN/versions.md#本机已有的编译器)。
+[link.md](docs/zh-CN/link.md)。
 
 ## 文档
 
 **使用插件**
 
 - [版本](docs/zh-CN/versions.md)：版本写法、安装、搜索和选择编译器
+- [本机已有的编译器](docs/zh-CN/link.md)：用 `vfox link --detect kotlin` 纳入本机编译器
 - [从源码安装](docs/zh-CN/install-from-source.md)：试用本仓库中尚未发布的改动
 - [疑难解答](docs/zh-CN/troubleshooting.md)：Java、shell hook、校验和下载问题
 

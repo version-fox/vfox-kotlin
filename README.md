@@ -59,13 +59,14 @@ vfox link --detect kotlin
 
 This needs vfox 1.1.0 or later. vfox lists what the plugin found and links what
 you pick; `vfox link --detect -y kotlin` links everything without asking.
-See [versions.md](docs/versions.md#already-installed-compilers).
+See [link.md](docs/link.md).
 
 ## Documentation
 
 **Using the plugin**
 
 - [Versions](docs/versions.md): version syntax, installing, searching and selecting a compiler
+- [Already installed compilers](docs/link.md): adopt compilers on the machine with `vfox link --detect kotlin`
 - [Install from source](docs/install-from-source.md): try an unreleased change from this checkout
 - [Troubleshooting](docs/troubleshooting.md): Java, shell hooks, checksums and downloads
 

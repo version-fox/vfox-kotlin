@@ -70,7 +70,8 @@ vfox link --detect kotlin
 - IntelliJ IDEA 和 Toolbox 自带的编译器，位于 `plugins/kotlin/kotlinc`
 - `KOTLIN_HOME`，以及 Windows 上 `Program Files` 和 `USERPROFILE` 下的对应位置
 
-要纳入未扫描位置的编译器，可以手工指向其主目录（即包含 `bin` 的目录）：
+完整列表、命名规则和手工纳入见 [link.md](link.md)。要纳入未扫描位置的编译器，可以
+手工指向其主目录（即包含 `bin` 的目录）：
 
 ```bash
 vfox link kotlin@2.0.0-system /opt/my-kotlin

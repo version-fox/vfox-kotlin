@@ -78,6 +78,7 @@ under vfox's own directories are never offered. It looks in:
 - IntelliJ IDEA and Toolbox bundles, which keep the compiler under `plugins/kotlin/kotlinc`
 - `KOTLIN_HOME`, and the equivalent Windows locations under `Program Files` and `USERPROFILE`
 
+See [link.md](link.md) for the full list, the naming rules and manual linking.
 To adopt a compiler in a location that is not scanned, point at its home
 directory by hand — the one that holds `bin`:
 
