@@ -70,13 +70,30 @@ function detect.list_children(dir)
         return {}
     end
     local result = {}
-    for line in handle:lines() do
+    local function add(line)
         line = trim(line)
         if line ~= "" and line ~= "." and line ~= ".." then
             table.insert(result, detect.join(dir, line))
         end
     end
-    handle:close()
+    -- Some vfox runtimes do not give popen handles a `lines` method; read
+    -- line by line there (notably on Windows).
+    if handle.lines then
+        for line in handle:lines() do
+            add(line)
+        end
+    else
+        while true do
+            local line = handle:read("*l")
+            if not line then
+                break
+            end
+            add(line)
+        end
+    end
+    if handle.close then
+        handle:close()
+    end
     return result
 end
 
