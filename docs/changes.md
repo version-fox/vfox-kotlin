@@ -4,7 +4,7 @@
 
 What changed in each release. GitHub's release pages list the pull requests.
 
-## Unreleased
+## 0.1.2 (2026-11-17)
 
 - Bundle Kotlin/Native with the JVM compiler. `PreInstall` adds JetBrains' prebuilt native archive as an additional package on hosts that have one, `EnvKeys` puts its `bin` directory on `PATH`, and `kotlinc-native`, `konanc` and `klib` are now available next to `kotlinc`. The asset name follows the release (it changed in Kotlin 2.0) and is verified with its own `.sha256` when published. Needs vfox 1.0.0 or later; hosts without a native build still get the JVM compiler. The Linux and Windows E2E suites now check `kotlinc-native -version`.
 - Bilingual README and documentation in English and Chinese, covering versions, installing from source, development, E2E, troubleshooting and this changelog.
