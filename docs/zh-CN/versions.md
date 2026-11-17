@@ -35,8 +35,36 @@ vfox current kotlin             # 当前选中的版本
 ```
 
 `EnvKeys` 把 `<sdk>/bin` 加入 `PATH`，归档包中的 `kotlinc`、`kotlin`、
-`kotlinc-jvm` 和 `kotlinc-js` 启动脚本就在该目录。要应用这些变量，必须启用 shell
-hook，参见 vfox 的[快速开始](https://vfox.dev/guides/quick-start.html)。
+`kotlinc-jvm` 和 `kotlinc-js` 启动脚本就在该目录；如果安装了 Kotlin/Native，它的
+`bin` 目录也会加入。要应用这些变量，必须启用 shell hook，参见 vfox 的
+[快速开始](https://vfox.dev/guides/quick-start.html)。
+
+## Kotlin/Native
+
+Kotlin/Native 不在 `kotlin-compiler` 归档包中，而是 JetBrains 单独发布的资源。
+只要主机有对应的预编译编译器，`PreInstall` 就会把它作为附加包一起下载，因此一次
+`vfox install` 就能同时获得两套工具链：
+
+```bash
+kotlinc-native -version
+kotlinc-native hello.kt -o hello
+```
+
+| 主机 | 原生归档包 | 起始版本 |
+| --- | --- | --- |
+| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0 |
+| Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
+| macOS x86_64 / arm64 | `kotlin-native-prebuilt-macos-<arch>-<version>.tar.gz` | 2.0.0 |
+| macOS x86_64 / arm64 | `kotlin-native-macos-<arch>-<version>.tar.gz` | 1.9.0 |
+| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0 |
+| Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
+
+Kotlin 2.0 更改了归档包名称，插件会按版本选择规范名称，并在 JetBrains 提供 `.sha256`
+时用它校验。1.9.0 之前的版本没有原生归档包，只会安装 JVM 编译器。Linux arm64 没有
+预编译的原生编译器，这些主机同样只安装 JVM 编译器。附带原生编译器需要 vfox 1.0.0
+或更新版本。
+
+和 `kotlinc` 一样，`kotlinc-native` 也是 JVM 启动脚本，需要 `PATH` 上有 Java。
 
 ## 校验和
 

@@ -48,9 +48,15 @@ vfox 加载 `metadata.lua`，在命令需要时调用 hook，并把 `PLUGIN` 和
   除非返回 200，否则抛出 `Current version information not detected.`。对 1.9.0
   及以上的版本，它 GET `<url>.sha256` 并把内容作为 `sha256` 返回；否则不返回
   校验和。结果中的 `version` 是 vfox 安装时使用的名称，因此 `latest` 在这里被
-  解析为具体版本。
-- `EnvKeys` 返回 `{ key = "PATH", value = ctx.path .. "/bin" }`。vfox 会去掉归档包
-  顶层的 `kotlinc` 目录，因此启动脚本直接位于 `<sdk>/bin`。
+  解析为具体版本。它还会探测 `lib/util.lua` 中按平台生成的 Kotlin/Native 资源；
+  HEAD 请求成功时，该归档包会作为 `addition` 返回（JetBrains 发布 `.sha256` 时也一并
+  返回），由 vfox 作为第二个包下载并解压。缺少原生资源只会使 `kotlinc-native` 不可用，
+  编译器仍会正常安装。
+- `EnvKeys` 返回 `{ key = "PATH", value = ctx.path .. "/bin" }`，并为 `ctx.sdkInfo` 中
+  每个非主包再返回一条 PATH 记录。vfox 会去掉归档包顶层的 `kotlinc` 目录，因此启动
+  脚本直接位于 `<sdk>/bin`，而 Kotlin/Native 附加包的 `bin` 中有 `kotlinc-native`、
+  `konanc` 和 `klib`。vfox 以运行时目录名（`add-native-<version>`）作为附加包的键，
+  而不是 `PreInstall` 中发送的 `name`。
 - `PreUse` 和 `PostInstall` 是空操作；vfox 无需插件帮助即可匹配已安装版本并应用
   `EnvKeys`。
 - `Detect` 扫描 SDKMAN、asdf、mise、Homebrew、IDE 自带目录、系统目录和 `KOTLIN_HOME`，

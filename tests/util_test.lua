@@ -39,3 +39,53 @@ for _, case in ipairs(cases) do
 end
 
 print("PASS: " .. #cases .. " version comparison cases")
+
+-- Kotlin/Native is a separate asset. The platform token and the archive name
+-- must match JetBrains' release naming, which changed in 2.0.
+local nativePlatforms = {
+    { "linux", "amd64", "linux-x86_64", "tar.gz" },
+    { "darwin", "amd64", "macos-x86_64", "tar.gz" },
+    { "darwin", "arm64", "macos-aarch64", "tar.gz" },
+    { "windows", "amd64", "windows-x86_64", "zip" },
+}
+for _, case in ipairs(nativePlatforms) do
+    local platform, extension = util:NativePlatform(case[1], case[2])
+    assert(platform == case[3], case[1] .. "/" .. case[2] .. ": unexpected platform " .. tostring(platform))
+    assert(extension == case[4], case[1] .. "/" .. case[2] .. ": unexpected extension " .. tostring(extension))
+end
+-- No prebuilt native compiler exists for Linux arm64.
+assert(util:NativePlatform("linux", "arm64") == nil, "Linux arm64 must have no native platform")
+
+local nativeUrls = {
+    {
+        "2.0.21",
+        "linux",
+        "amd64",
+        "https://github.com/JetBrains/kotlin/releases/download/v2.0.21/kotlin-native-prebuilt-linux-x86_64-2.0.21.tar.gz",
+    },
+    {
+        "2.0.21",
+        "windows",
+        "amd64",
+        "https://github.com/JetBrains/kotlin/releases/download/v2.0.21/kotlin-native-prebuilt-windows-x86_64-2.0.21.zip",
+    },
+    {
+        "1.9.24",
+        "linux",
+        "amd64",
+        "https://github.com/JetBrains/kotlin/releases/download/v1.9.24/kotlin-native-linux-x86_64-1.9.24.tar.gz",
+    },
+    {
+        "1.9.24",
+        "darwin",
+        "arm64",
+        "https://github.com/JetBrains/kotlin/releases/download/v1.9.24/kotlin-native-macos-aarch64-1.9.24.tar.gz",
+    },
+}
+for _, case in ipairs(nativeUrls) do
+    local url = util:NativeDownloadURL(case[1], case[2], case[3])
+    assert(url == case[4], case[1] .. "/" .. case[2] .. ": unexpected native URL " .. tostring(url))
+end
+assert(util:NativeDownloadURL("2.0.21", "linux", "arm64") == nil, "unsupported platforms must have no native URL")
+
+print("PASS: " .. #nativeUrls .. " Kotlin/Native URL cases")

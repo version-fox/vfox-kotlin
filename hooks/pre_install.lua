@@ -15,6 +15,39 @@
 local util = require("util")
 local http = require("http")
 
+--- Build the additional package holding Kotlin/Native, when JetBrains
+--- publishes a prebuilt compiler for this host. vfox downloads and extracts
+--- it into `add-native-<version>` beside the main SDK, and EnvKeys puts its
+--- bin directory on PATH so `kotlinc-native` is available too. A missing
+--- asset is not fatal: the compiler-only install still succeeds.
+--- @param version string Kotlin release
+--- @return table|nil addition
+local function nativeAddition(version)
+    local url = util:NativeDownloadURL(version, RUNTIME.osType, RUNTIME.archType)
+    if url == nil then
+        return nil
+    end
+    local resp, err = http.head({
+        url = url,
+    })
+    if err ~= nil or resp.status_code ~= 200 then
+        return nil
+    end
+    local addition = {
+        name = "native",
+        version = version,
+        url = url,
+    }
+    -- Older releases have no native .sha256; verify when one is published.
+    local checksum, checksumErr = http.get({
+        url = url .. ".sha256",
+    })
+    if checksumErr == nil and checksum.status_code == 200 and checksum.body ~= "" then
+        addition.sha256 = checksum.body
+    end
+    return addition
+end
+
 --- Returns some pre-installed information, such as version number, download address, local files, etc.
 --- If checksum is provided, vfox will automatically check it for you.
 --- @param ctx table Context information; ctx.version is the requested version
@@ -33,6 +66,10 @@ function PLUGIN:PreInstall(ctx)
     if err ~= nil or resp.status_code ~= 200 then
         error("Current version information not detected.")
     end
+    local result = {
+        version = version,
+        url = url,
+    }
     if util:compare_versions({ version = version }, { version = "1.9.0" }) or version == "1.9.0" then
         resp, err = http.get({
             url = url .. ".sha256",
@@ -40,15 +77,11 @@ function PLUGIN:PreInstall(ctx)
         if err ~= nil or resp.status_code ~= 200 then
             error("Current version checksum not detected.")
         end
-        return {
-            version = version,
-            url = url,
-            sha256 = resp.body,
-        }
-    else
-        return {
-            version = version,
-            url = url,
-        }
+        result.sha256 = resp.body
     end
+    local native = nativeAddition(version)
+    if native ~= nil then
+        result.addition = { native }
+    end
+    return result
 end

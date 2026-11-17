@@ -38,9 +38,40 @@ vfox current kotlin            # the selected version
 ```
 
 `EnvKeys` adds `<sdk>/bin` to `PATH`, which is where the `kotlinc`, `kotlin`,
-`kotlinc-jvm` and `kotlinc-js` launchers live inside the installed archive.
+`kotlinc-jvm` and `kotlinc-js` launchers live inside the installed archive. It
+also adds the Kotlin/Native compiler's `bin` directory when one is installed.
 A shell hook must be active for the variables to be applied; see vfox's
 [quick start](https://vfox.dev/guides/quick-start.html).
+
+## Kotlin/Native
+
+Kotlin/Native is not part of the `kotlin-compiler` archive: JetBrains publishes
+it as a separate asset. `PreInstall` adds it as an additional package whenever
+a prebuilt compiler exists for the host, so a single `vfox install` provides
+both toolchains:
+
+```bash
+kotlinc-native -version
+kotlinc-native hello.kt -o hello
+```
+
+| Host | Native archive | From |
+| --- | --- | --- |
+| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0 |
+| Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
+| macOS x86_64 / arm64 | `kotlin-native-prebuilt-macos-<arch>-<version>.tar.gz` | 2.0.0 |
+| macOS x86_64 / arm64 | `kotlin-native-macos-<arch>-<version>.tar.gz` | 1.9.0 |
+| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0 |
+| Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
+
+The archive name changed in Kotlin 2.0; the plugin chooses the canonical name
+for the release and verifies it against the `.sha256` file when JetBrains
+publishes one. Releases before 1.9.0 have no native archive and install the JVM
+compiler only. There is no prebuilt native compiler for Linux arm64, so those
+hosts also get the JVM compiler only. Bundling the native compiler requires
+vfox 1.0.0 or later.
+
+Like `kotlinc`, `kotlinc-native` is a JVM launcher and needs Java on `PATH`.
 
 ## Checksums
 

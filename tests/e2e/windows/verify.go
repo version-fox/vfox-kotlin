@@ -83,6 +83,23 @@ func firstLineAfter(out, needle string) string {
 	return ""
 }
 
+// verifyNative checks the Kotlin/Native addition on Windows: its .bat
+// launcher must resolve from the added bin directory and report the release.
+func verifyNative(ctx context.Context, t *testing.T, ctr tc.Container, box slotBox, activation, version string) {
+	t.Helper()
+
+	script := activatedEnv(activation,
+		`$cmd = Get-Command kotlinc-native; `+
+			`if (-not $cmd) { throw 'kotlinc-native not on PATH' }; `+
+			`$cmd.Source; `+
+			`kotlinc-native -version`)
+	out := common.StripANSI(execOK(ctx, t, ctr, script, box.vars...))
+	require.Containsf(t, strings.ReplaceAll(out, "/", `\`), `\bin\kotlinc-native.bat`,
+		"kotlinc-native must resolve from a bin directory\n--- output ---\n%s", out)
+	require.Containsf(t, out, version, "kotlinc-native -version must report %s\n--- output ---\n%s", version, out)
+	t.Logf("PASS: kotlinc-native %s is on PATH on Windows", version)
+}
+
 func checkMissingVersionRejected(ctx context.Context, t *testing.T, ctr tc.Container, box slotBox) {
 	t.Helper()
 	code, out := execRun(ctx, t, ctr, "vfox install kotlin@0.0.0-e2e-missing", box.vars...)

@@ -67,6 +67,13 @@ func HasChecksum(version string) bool {
 	return CompareVersions(version, "1.9.0") >= 0
 }
 
+// HasNative reports whether JetBrains publishes a Kotlin/Native archive for
+// the E2E target. Both suites run on amd64, where native builds exist from
+// 1.9.0 on; Linux arm64 has no prebuilt native compiler.
+func HasNative(version, arch string) bool {
+	return arch == "amd64" && CompareVersions(version, "1.9.0") >= 0
+}
+
 // CompareVersions compares dot-separated numeric versions. Missing components
 // count as zero, as in lib/util.lua.
 func CompareVersions(a, b string) int {

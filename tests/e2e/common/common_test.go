@@ -51,6 +51,13 @@ func TestHasChecksum(t *testing.T) {
 	assert.True(t, HasChecksum(DefaultVersion))
 }
 
+func TestHasNative(t *testing.T) {
+	assert.False(t, HasNative(LegacyVersion, "amd64"))
+	assert.True(t, HasNative("1.9.0", "amd64"))
+	assert.True(t, HasNative(DefaultVersion, "amd64"))
+	assert.False(t, HasNative(DefaultVersion, "arm64"), "no prebuilt native compiler for Linux arm64")
+}
+
 func TestNormalizeArch(t *testing.T) {
 	for _, s := range []string{"amd64", "x86_64", "AMD64", "x64"} {
 		got, err := NormalizeArch(s)

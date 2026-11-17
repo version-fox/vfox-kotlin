@@ -30,6 +30,16 @@ local function answer(request)
     if url:find("kotlinlang.org", 1, true) then
         return { status_code = 200, body = releases }
     end
+    -- Only these two releases ship a Kotlin/Native archive in this fixture.
+    if url:find("kotlin-native-", 1, true) then
+        if not (url:find("2.0.0", 1, true) or url:find("1.9.0", 1, true)) then
+            return { status_code = 404, body = "Not Found" }
+        end
+        if url:sub(-#".sha256") == ".sha256" then
+            return { status_code = 200, body = sha256 }
+        end
+        return { status_code = 200, body = "" }
+    end
     if url:sub(-#".sha256") == ".sha256" then
         if url:find("2.0.0", 1, true) or url:find("1.9.0", 1, true) then
             return { status_code = 200, body = sha256 }
@@ -54,28 +64,58 @@ local function urlFor(version)
     )
 end
 
+local function nativeUrlFor(version)
+    local prefix = "kotlin-native-"
+    if version == "2.0.0" then
+        prefix = "kotlin-native-prebuilt-"
+    end
+    return string.format(
+        "https://github.com/JetBrains/kotlin/releases/download/v%s/%slinux-x86_64-%s.tar.gz",
+        version,
+        prefix,
+        version
+    )
+end
+
+local function countCompilerChecksums()
+    local count = 0
+    for _, url in ipairs(requests) do
+        if url:find("kotlin-compiler-", 1, true) and url:sub(-#".sha256") == ".sha256" then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local cases = 0
-local function check(version)
+local function check(version, wantNative)
     requests = {}
     local result = plugin:PreInstall({ version = version })
     assert(result.version == version, version .. ": unexpected installed version " .. tostring(result.version))
     assert(result.url == urlFor(version), version .. ": unexpected URL " .. tostring(result.url))
     if version == "1.8.22" then
         assert(result.sha256 == nil or result.sha256 == "", version .. ": no checksum should be returned before 1.9.0")
-        assert(#requests == 1, "older releases need only the HEAD request")
+        assert(countCompilerChecksums() == 0, "older releases need no compiler checksum request")
     else
         assert(result.sha256 == sha256, version .. ": expected the .sha256 body")
-        assert(
-            #requests == 2 and requests[2] == urlFor(version) .. ".sha256",
-            version .. ": the checksum file must be fetched"
-        )
+        assert(countCompilerChecksums() == 1, version .. ": the compiler checksum file must be fetched")
+    end
+    if wantNative then
+        assert(result.addition ~= nil and #result.addition == 1, version .. ": expected a native addition")
+        local native = result.addition[1]
+        assert(native.name == "native", version .. ": unexpected addition name " .. tostring(native.name))
+        assert(native.version == version, version .. ": unexpected addition version " .. tostring(native.version))
+        assert(native.url == nativeUrlFor(version), version .. ": unexpected native URL " .. tostring(native.url))
+        assert(native.sha256 == sha256, version .. ": expected the native .sha256 body")
+    else
+        assert(result.addition == nil or #result.addition == 0, version .. ": no native addition should be present")
     end
     cases = cases + 1
 end
 
-check("2.0.0")
-check("1.9.0")
-check("1.8.22")
+check("2.0.0", true)
+check("1.9.0", true)
+check("1.8.22", false)
 
 -- `latest` resolves through Available to the first listed release.
 requests = {}
@@ -83,6 +123,7 @@ local latest = plugin:PreInstall({ version = "latest" })
 assert(latest.version == "2.0.0", "latest must resolve to 2.0.0, got " .. tostring(latest.version))
 assert(latest.url == urlFor("2.0.0"), "latest must use the resolved release's URL")
 assert(latest.sha256 == sha256, "latest must use the resolved release's checksum")
+assert(latest.addition ~= nil and latest.addition[1].url == nativeUrlFor("2.0.0"), "latest must bundle Kotlin/Native")
 cases = cases + 1
 
 -- A version JetBrains never published fails in PreInstall's HEAD check.
