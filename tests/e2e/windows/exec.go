@@ -19,6 +19,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"time"
 
 	tc "github.com/testcontainers/testcontainers-go"
 	tcexec "github.com/testcontainers/testcontainers-go/exec"
@@ -36,7 +37,11 @@ func execRun(ctx context.Context, t *testing.T, ctr tc.Container, script string,
 	if len(extraEnv) > 0 {
 		opts = append(opts, tcexec.WithEnv(extraEnv))
 	}
-	code, r, err := ctr.Exec(ctx, []string{"pwsh", "-NoProfile", "-Command", pwshPrelude + " " + script}, opts...)
+	// Bound every exec: a pwsh process that waits forever must fail in
+	// minutes, not consume the whole job timeout.
+	execCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+	defer cancel()
+	code, r, err := ctr.Exec(execCtx, []string{"pwsh", "-NoProfile", "-NonInteractive", "-Command", pwshPrelude + " " + script}, opts...)
 	if err != nil {
 		t.Fatalf("exec: %v\n--- script ---\n%s", err, script)
 	}

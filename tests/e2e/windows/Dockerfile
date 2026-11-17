@@ -19,11 +19,15 @@ SHELL ["powershell", "-NoProfile", "-Command"]
 
 # PowerShell 7: the Go test drives the container with `pwsh -NoProfile
 # -Command`. The stock servercore only has Windows PowerShell 5.1.
+ENV POWERSHELL_TELEMETRY_OPTOUT=1
+
 RUN $ErrorActionPreference = 'Stop'; `
-    Invoke-WebRequest -UseBasicParsing -Uri 'https://github.com/PowerShell/PowerShell/releases/download/v7.4.6/powershell-7.4.6-win-x64.zip' -OutFile C:\pwsh.zip; `
-    Expand-Archive -Path C:\pwsh.zip -DestinationPath 'C:\Program Files\PowerShell\7' -Force; `
+    curl.exe -fsSL --retry 3 --retry-delay 5 --retry-all-errors -o C:\pwsh.zip 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.6/PowerShell-7.6.6-win-x64.zip'; `
+    New-Item -ItemType Directory -Force -Path 'C:\Program Files\PowerShell\7' | Out-Null; `
+    tar.exe -xf C:\pwsh.zip -C 'C:\Program Files\PowerShell\7'; `
     Remove-Item C:\pwsh.zip; `
-    [Environment]::SetEnvironmentVariable('Path', 'C:\Program Files\PowerShell\7;' + [Environment]::GetEnvironmentVariable('Path', 'Machine'), 'Machine'); `
+    if (-not (Test-Path 'C:\Program Files\PowerShell\7\pwsh.exe')) { throw 'pwsh.exe is missing after extraction' }; `
+    [Environment]::SetEnvironmentVariable('Path', [Environment]::GetEnvironmentVariable('Path', 'Machine') + ';C:\Program Files\PowerShell\7', 'Machine'); `
     New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem' -Name LongPathsEnabled -Value 1 -PropertyType DWord -Force | Out-Null
 
 # A JRE is required: kotlinc and kotlin are JVM launchers. Pin the Temurin 17
