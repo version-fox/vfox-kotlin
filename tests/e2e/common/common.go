@@ -43,13 +43,14 @@ const (
 	LegacyVersion = "1.8.22"
 
 	// VfoxVersion and VfoxTag pin the release installed in the containers.
-	VfoxVersion = "1.0.13"
+	// 1.1.0 is the release that added the Detect hook used by --detect.
+	VfoxVersion = "1.1.0"
 	VfoxTag     = "v" + VfoxVersion
 
 	// Checksums of the pinned vfox archives (sha256sum of the release assets).
-	VfoxLinuxAMD64SHA256   = "7ad0a4c82c8173f09393e09abecc3e27468253bab5fe53ffbf58f2b12b3fc768"
-	VfoxLinuxARM64SHA256   = "7cec88e6e9be551cb138e061d37521286d34096fdc0c4fdb65d89cef30c58583"
-	VfoxWindowsAMD64SHA256 = "dab9f12aa1139eb4a055afccbfa2b970b389e1fd3f14c94e9e6793ae5fc66e0a"
+	VfoxLinuxAMD64SHA256   = "3b33c3c468b27bc17aecf0d6d3af24fe49fe204972984904a136a47b402a0ee4"
+	VfoxLinuxARM64SHA256   = "e702e057dfe588200727dfb3cf786d181b13f015cbcc9e13679a3edcfd07e430"
+	VfoxWindowsAMD64SHA256 = "1bbec8fffddbb62de0d93030c3f6203c69680662bc65257ca4a5e611cb607d0a"
 )
 
 // Version returns the Kotlin release to test, honouring $KOTLIN_VERSION.

@@ -107,3 +107,6 @@ docker run --rm -v "$PWD:/work" -w /work apache/skywalking-eyes:0.9.0 header fix
 5. `vfox use --global` 选中编译器。在新的 shell 中，SDK 的 `bin` 位于 `PATH` 中，
    `vfox env` 导出它，`kotlinc -version` 和 `kotlin -version` 报告请求的版本，
    `vfox current kotlin` 给出选中的版本。
+6. `vfox link --detect kotlin` 找到被复制到 vfox 目录之外并由 `KOTLIN_HOME` 指向的
+   编译器，将其纳入，链接会出现在 `vfox list kotlin` 中并标为 `(linked → …)`。
+   固定使用的 vfox 1.1.0 是首个支持 `Detect` hook 的版本。

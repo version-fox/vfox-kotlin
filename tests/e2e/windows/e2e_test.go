@@ -100,6 +100,7 @@ func TestE2E(t *testing.T) {
 	checkMissingVersionRejected(ctx, t, ctr, box)
 	useKotlin(ctx, t, ctr, box, activation, common.Version())
 	verifyToolchain(ctx, t, ctr, box, activation, common.Version())
+	checkDetect(ctx, t, ctr, box, activation)
 
 	installKotlin(ctx, t, ctr, box, common.LegacyVersion)
 }

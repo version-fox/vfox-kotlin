@@ -11,8 +11,11 @@ hooks/pre_install.lua           vfox install: resolve the URL and checksum
 hooks/post_install.lua          no-op
 hooks/env_keys.lua              adds <sdk>/bin to PATH
 hooks/pre_use.lua               no-op
+hooks/detect.lua                vfox link --detect: find compilers already installed
 lib/util.lua                    download URL template and version comparison
+lib/detect_kotlin.lua           scanning roots, build.txt version and compiler home checks
 tests/*_test.lua                offline hook tests, run by vfox plugin test
+tests/detect*_test.lua          offline tests of the Detect hook
 tests/e2e/                      container tests, see e2e.md
 Injection.lua                   type hints for what vfox injects, never loaded
 README.md, docs/                English documentation; README_CN.md and
@@ -36,6 +39,7 @@ vfox loads `metadata.lua`, calls a hook when a command needs it, and puts
 | `vfox search kotlin` | `Available` |
 | `vfox install kotlin@2.0.0` | `PreInstall`; vfox downloads, verifies and unpacks |
 | `vfox use kotlin@2.0.0` | `PreUse` (no-op), then `EnvKeys` |
+| `vfox link --detect kotlin` | `Detect` returns compilers already on the machine |
 | a shell hook | `EnvKeys` for the selected version |
 
 - `Available` fetches the release details page and parses `tbody tr` / `td b`.
@@ -52,6 +56,13 @@ vfox loads `metadata.lua`, calls a hook when a command needs it, and puts
   directly in `<sdk>/bin`.
 - `PreUse` and `PostInstall` are no-ops; vfox matches an installed version and
   applies `EnvKeys` without help from the plugin.
+- `Detect` scans SDKMAN, asdf, mise, Homebrew, IDE bundles, the system
+  directories and `KOTLIN_HOME` for compiler homes with `bin/kotlinc` and
+  `build.txt`. It returns `{ version, path, note }`; the version comes from
+  `build.txt` (falling back to the directory name), so a detected compiler is
+  named exactly like an installed one. Paths under `.vfox` are skipped, and
+  results are deduplicated and sorted. The hook needs vfox 1.1.0; older vfox
+  simply ignores it.
 
 ## Tests
 

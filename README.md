@@ -47,6 +47,20 @@ behaviour of releases before 1.9.0.
 already be on your `PATH`. The plugin does not install Java; use the
 [vfox-java](https://github.com/version-fox/vfox-java) plugin if you need one.
 
+## Already installed compilers
+
+If a Kotlin compiler is already on the machine — from SDKMAN, asdf, mise,
+Homebrew, an IDE bundle, the system package manager or `KOTLIN_HOME` — adopt it
+instead of downloading another copy:
+
+```bash
+vfox link --detect kotlin
+```
+
+This needs vfox 1.1.0 or later. vfox lists what the plugin found and links what
+you pick; `vfox link --detect -y kotlin` links everything without asking.
+See [versions.md](docs/versions.md#already-installed-compilers).
+
 ## Documentation
 
 **Using the plugin**

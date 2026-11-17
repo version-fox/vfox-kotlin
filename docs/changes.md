@@ -12,7 +12,8 @@ What changed in each release. GitHub's release pages list the pull requests.
 - Lint and formatting checks for Go, Lua and the workflows (`gofmt`, `go vet`, stylua, lua-language-server, actionlint), with pinned tooling and a `stylua.toml` / `.luarc.json`.
 - Apache-2.0 header checks with Apache SkyWalking Eyes, plus `.licenserc.yaml`, `.license.tpl` and headers on every source file.
 - `opencode.jsonc` allowing OpenCode sessions in this repository to run `git push`, `gh pr create` and `gh pr comment`.
-- Repository hygiene: `.gitattributes`, `.dockerignore`, an expanded `.gitignore` and a Linux dev container.
+- `vfox link --detect kotlin` adopts Kotlin compilers that are already on the machine — from SDKMAN, asdf, mise, Homebrew, IDE bundles, system directories and `KOTLIN_HOME`. A compiler home is recognised by `bin/kotlinc` and `build.txt`, and is named by the version in that file. Needs vfox 1.1.0 or later; documented in [versions.md](versions.md#already-installed-compilers).
+- Repository hygiene: `.gitattributes`, `.dockerignore`, an expanded `.gitignore` and a Linux dev container. The pinned vfox in tests and E2E is now 1.1.0.
 
 ## 0.1.1 (2026-09-12)
 

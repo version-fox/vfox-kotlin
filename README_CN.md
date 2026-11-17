@@ -42,6 +42,19 @@ vfox use --global kotlin@2.1.0 # 所有新 shell
 `kotlinc` 和 `kotlin` 是 JVM 启动脚本，因此 `PATH` 上必须已有 Java 运行时（17 或更新）。
 本插件不安装 Java；如果需要，请使用 [vfox-java](https://github.com/version-fox/vfox-java) 插件。
 
+## 本机已有的编译器
+
+如果机器上已有 Kotlin 编译器——来自 SDKMAN、asdf、mise、Homebrew、IDE 自带、
+系统包管理器或 `KOTLIN_HOME`——可以直接纳入而不必再下载一份：
+
+```bash
+vfox link --detect kotlin
+```
+
+这需要 vfox 1.1.0 或更新版本。vfox 会列出插件找到的编译器并让你选择；
+`vfox link --detect -y kotlin` 会不问确认地全部纳入。详见
+[versions.md](docs/zh-CN/versions.md#本机已有的编译器)。
+
 ## 文档
 
 **使用插件**

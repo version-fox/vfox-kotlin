@@ -12,7 +12,8 @@
 - Go、Lua 和工作流的 lint 与格式检查（`gofmt`、`go vet`、stylua、lua-language-server、actionlint），工具版本固定，并提供 `stylua.toml` / `.luarc.json`。
 - 使用 Apache SkyWalking Eyes 进行 Apache-2.0 头部检查，提供 `.licenserc.yaml`、`.license.tpl` 并为每个源文件添加头部。
 - `opencode.jsonc` 允许本仓库中的 OpenCode 会话运行 `git push`、`gh pr create` 和 `gh pr comment`。
-- 仓库规范：`.gitattributes`、`.dockerignore`、扩充的 `.gitignore` 以及 Linux 开发容器。
+- `vfox link --detect kotlin` 纳入本机已有的 Kotlin 编译器——来自 SDKMAN、asdf、mise、Homebrew、IDE 自带目录、系统目录和 `KOTLIN_HOME`。编译器目录通过 `bin/kotlinc` 和 `build.txt` 识别，并按文件中的版本命名。需要 vfox 1.1.0 或更新版本；详见[版本](versions.md#本机已有的编译器)。
+- 仓库规范：`.gitattributes`、`.dockerignore`、扩充的 `.gitignore` 以及 Linux 开发容器。测试和 E2E 中固定的 vfox 版本现为 1.1.0。
 
 ## 0.1.1（2026-09-12）
 

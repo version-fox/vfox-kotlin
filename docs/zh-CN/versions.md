@@ -48,6 +48,35 @@ hook，参见 vfox 的[快速开始](https://vfox.dev/guides/quick-start.html)�
 `WARNING: Checksum is not provided, skip verify...`。这是预期行为；若旧版本因其他
 原因安装失败，参见[疑难解答](troubleshooting.md)。
 
+## 本机已有的编译器
+
+如果机器上已有来自 SDKMAN、asdf、mise、Homebrew、IDE、系统包管理器或
+`KOTLIN_HOME` 的编译器，vfox 可以直接纳入：
+
+```bash
+vfox link --detect kotlin
+```
+
+这需要 vfox 1.1.0 或更新版本（`vfox --version`）。vfox 会显示插件找到的编译器并让你
+选择；加上 `-y` 则不问确认地全部纳入。之后 `vfox list kotlin` 会把这些版本标记为
+`(linked → <path>)`，`vfox uninstall` 只删除链接，不会移动编译器。
+
+插件通过 `bin/kotlinc` 启动脚本和 `build.txt` 识别编译器目录，并按文件中的版本命名，
+因此检测到的编译器写法与安装的完全一致（例如 `2.0.0`）。vfox 自己目录下的条目
+永远不会被提供。扫描位置包括：
+
+- SDKMAN（`~/.sdkman/candidates/kotlin`）、asdf 和 mise 的安装目录
+- Homebrew 和 Linuxbrew 的 keg，以及系统目录（`/usr/share/kotlinc`、`/opt`、`/usr/local`）
+- IntelliJ IDEA 和 Toolbox 自带的编译器，位于 `plugins/kotlin/kotlinc`
+- `KOTLIN_HOME`，以及 Windows 上 `Program Files` 和 `USERPROFILE` 下的对应位置
+
+要纳入未扫描位置的编译器，可以手工指向其主目录（即包含 `bin` 的目录）：
+
+```bash
+vfox link kotlin@2.0.0-system /opt/my-kotlin
+vfox use --global kotlin@2.0.0-system
+```
+
 ## Java
 
 Kotlin 编译器是 JVM 程序。运行 `kotlinc` 或 `kotlin` 前，`PATH` 上必须已有 Java

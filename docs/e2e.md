@@ -114,3 +114,7 @@ Both platforms run the same flow:
    is on `PATH`, `vfox env` exports it, `kotlinc -version` and
    `kotlin -version` report the requested version, and `vfox current kotlin`
    names the selection.
+6. `vfox link --detect kotlin` finds a compiler copied outside vfox's own
+   directories and pointed to by `KOTLIN_HOME`, links it, and the link shows up
+   in `vfox list kotlin` as `(linked → …)`. The pinned vfox 1.1.0 is the first
+   release with the `Detect` hook.

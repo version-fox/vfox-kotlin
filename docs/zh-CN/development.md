@@ -11,8 +11,11 @@ hooks/pre_install.lua           vfox install：解析 URL 和校验和
 hooks/post_install.lua          空操作
 hooks/env_keys.lua              把 <sdk>/bin 加入 PATH
 hooks/pre_use.lua               空操作
+hooks/detect.lua                vfox link --detect：查找本机已有的编译器
 lib/util.lua                    下载 URL 模板和版本比较
+lib/detect_kotlin.lua           扫描根目录、build.txt 版本和编译器目录判定
 tests/*_test.lua                离线 hook 测试，由 vfox plugin test 运行
+tests/detect*_test.lua          Detect hook 的离线测试
 tests/e2e/                      容器测试，见 e2e.md
 Injection.lua                   vfox 注入对象的类型提示，不会被加载
 README.md, docs/                英文文档；README_CN.md 和 docs/zh-CN/ 为中文版
@@ -35,6 +38,7 @@ vfox 加载 `metadata.lua`，在命令需要时调用 hook，并把 `PLUGIN` 和
 | `vfox search kotlin` | `Available` |
 | `vfox install kotlin@2.0.0` | `PreInstall`；随后 vfox 下载、校验并解压 |
 | `vfox use kotlin@2.0.0` | `PreUse`（空操作），然后 `EnvKeys` |
+| `vfox link --detect kotlin` | `Detect` 返回本机已有的编译器 |
 | shell hook | `EnvKeys` 应用于选中的版本 |
 
 - `Available` 获取发布详情页面并解析 `tbody tr` / `td b`，返回
@@ -49,6 +53,11 @@ vfox 加载 `metadata.lua`，在命令需要时调用 hook，并把 `PLUGIN` 和
   顶层的 `kotlinc` 目录，因此启动脚本直接位于 `<sdk>/bin`。
 - `PreUse` 和 `PostInstall` 是空操作；vfox 无需插件帮助即可匹配已安装版本并应用
   `EnvKeys`。
+- `Detect` 扫描 SDKMAN、asdf、mise、Homebrew、IDE 自带目录、系统目录和 `KOTLIN_HOME`，
+  寻找同时包含 `bin/kotlinc` 和 `build.txt` 的编译器目录。它返回
+  `{ version, path, note }`，版本取自 `build.txt`（缺失时回退到目录名），因此检测到的
+  编译器命名与安装时一致。`.vfox` 下的路径会被跳过，结果去重并排序。该 hook 需要
+  vfox 1.1.0；旧版 vfox 会直接忽略它。
 
 ## 测试
 
