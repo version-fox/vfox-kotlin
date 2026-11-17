@@ -1,0 +1,88 @@
+# Copyright 2026 Han Li and contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  # A new push to a pull request replaces the run of the push before it. Every
+  # commit on main gets a group of its own, so re-running an older commit does
+  # not cancel a newer one.
+  group: e2e-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  e2e-linux:
+    name: Linux (Ubuntu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      # The suite terminates every container explicitly via t.Cleanup, so it
+      # does not need Ryuk (which also keeps the local and CI paths identical).
+      TESTCONTAINERS_RYUK_DISABLED: "true"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.1'
+          cache: false
+      - name: Run the Linux E2E suite
+        run: go test -v -timeout 45m -run TestE2E ./linux
+        working-directory: tests/e2e
+
+  e2e-windows:
+    name: Windows
+    runs-on: windows-latest
+    timeout-minutes: 60
+    env:
+      TESTCONTAINERS_RYUK_DISABLED: "true"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.1'
+          cache: false
+      - name: Start the Windows container engine
+        shell: pwsh
+        run: |
+          # windows-latest ships the Windows container engine as the `docker`
+          # service, not Docker Desktop. It may be stopped on a fresh runner.
+          $service = Get-Service docker -ErrorAction SilentlyContinue
+          if (-not $service) { throw 'The Windows container engine (docker service) is not installed on this runner' }
+          if ($service.Status -ne 'Running') { Start-Service docker }
+          $PSNativeCommandUseErrorActionPreference = $false
+          $osType = ''
+          for ($attempt = 1; $attempt -le 60; $attempt++) {
+            $osType = (docker info --format '{{.OSType}}' 2>$null | Out-String).Trim()
+            if ($LASTEXITCODE -eq 0 -and $osType -ne '') { break }
+            Start-Sleep -Seconds 2
+          }
+          $PSNativeCommandUseErrorActionPreference = $true
+          if ($osType -ne 'windows') { throw "Docker is in '$osType' mode; Windows containers are required" }
+          docker version
+      - name: Run the Windows E2E suite
+        shell: pwsh
+        run: go test -v -timeout 55m -run TestE2E ./windows
+        working-directory: tests/e2e
