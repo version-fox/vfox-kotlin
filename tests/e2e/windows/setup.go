@@ -30,6 +30,7 @@ import (
 // as tcexec.WithEnv entries rather than being set once.
 type slotBox struct {
 	workDir   string
+	vfoxHome  string
 	vfoxExe   string
 	pluginZip string
 	vars      []string
@@ -46,18 +47,20 @@ func setupSlotEnv(ctx context.Context, t *testing.T, ctr tc.Container, slot stri
 	path := strings.TrimSpace(execOK(ctx, t, ctr, "$env:PATH"))
 	box := slotBox{
 		workDir:   root + `\vfox-e2e-runs\` + slot + `\work`,
+		vfoxHome:  root + `\John Doe\.vfox`,
 		vfoxExe:   root + `\vfox-e2e-runs\` + slot + `\work\vfox.exe`,
 		pluginZip: root + `\vfox-e2e-runs\` + slot + `\work\kotlin.zip`,
 	}
 	box.vars = []string{
 		"USERPROFILE=" + root + `\vfox-e2e-runs\` + slot,
-		"VFOX_HOME=" + root + `\John Doe\.vfox`,
+		"VFOX_HOME=" + box.vfoxHome,
 		"TEMP=" + box.workDir,
 		"TMP=" + box.workDir,
 		"PATH=" + box.workDir + ";" + path,
 	}
-	execOK(ctx, t, ctr, fmt.Sprintf("New-Item -ItemType Directory -Force -Path %s | Out-Null",
-		pwshQuote(box.workDir)), box.vars...)
+	execOK(ctx, t, ctr, fmt.Sprintf(
+		"New-Item -ItemType Directory -Force -Path %s, %s | Out-Null",
+		pwshQuote(box.workDir), pwshQuote(box.vfoxHome)), box.vars...)
 	return box
 }
 

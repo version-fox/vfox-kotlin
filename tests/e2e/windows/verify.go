@@ -59,7 +59,8 @@ func verifyToolchain(ctx context.Context, t *testing.T, ctr tc.Container, box sl
 	binDir := strings.TrimSpace(firstLineAfter(out, "kotlinc.bat"))
 	require.NotEmpty(t, binDir, "kotlinc must resolve to a path\n--- output ---\n"+out)
 	require.Containsf(t, out, "PATH=", "EnvKeys must add the SDK bin to PATH\n--- output ---\n%s", out)
-	require.Containsf(t, out, `kotlin\bin`, "SDK bin must appear on PATH\n--- output ---\n%s", out)
+	require.Containsf(t, strings.ReplaceAll(binDir, "/", `\`), `\bin\`,
+		"kotlinc must resolve from a bin directory\n--- output ---\n%s", out)
 	require.Containsf(t, out, "Kotlin version "+version,
 		"kotlin -version must report %s\n--- output ---\n%s", version, out)
 	require.Contains(t, out, version, "kotlinc/current must name the version\n--- output ---\n"+out)
