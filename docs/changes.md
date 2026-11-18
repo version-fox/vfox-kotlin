@@ -4,7 +4,7 @@
 
 What changed in each release. GitHub's release pages list the pull requests.
 
-## Unreleased
+## 0.1.3 (2026-11-18)
 
 - Fix `latest` failing with `Current version information not detected.`: the release page's first table lists release lines such as `2.4`, and `Available` listed them as versions, so `latest` resolved to `2.4`. `Available` now keeps only `X.Y.Z` releases, and `latest` installs the newest one.
 

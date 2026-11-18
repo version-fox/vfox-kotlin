@@ -41,10 +41,20 @@ arm64 版本）。如果 `kotlinc` 可用但 `kotlinc-native` 不可用，请用
 无法访问 GitHub。请用 `vfox search kotlin` 检查版本后重试；
 `vfox --debug install kotlin@<version>` 会显示 vfox 发出的请求。
 
+## `Current version checksum not detected.`
+
+从 1.9.0 起，`PreInstall` 还会下载 JetBrains 在每个归档包旁发布的 `.sha256` 文件。下载失败时
+安装会以此错误停止。通常是网络问题，或代理拦截了 GitHub 的访问；请重试，或用
+`vfox --debug install kotlin@<version>` 查看请求。
+
 ## `vfox install kotlin@latest` 失败
 
 `latest` 会读取 kotlinlang.org 上的 Kotlin 发布表格。如果该页面不可用，请改用
 具体版本号安装。
+
+0.1.2 及更早版本中，`latest` 还可能被解析为 `2.4` 这类版本线（它不是发布版本），安装因此以
+`Current version information not detected.` 失败。插件 0.1.3 已修复该问题：运行
+`vfox update kotlin` 后重试即可。
 
 ## 编译器已安装但版本较旧
 

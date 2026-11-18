@@ -15,8 +15,8 @@ vfox install kotlin@latest  # the newest release on the Kotlin release page
 
 `latest` is resolved by the `Available` hook: it reads the
 [Kotlin release details](https://kotlinlang.org/docs/releases.html#release-details)
-table and takes the first version listed. If that page cannot be reached,
-`vfox install kotlin@latest` fails rather than guessing a version.
+table and takes the first `X.Y.Z` release listed. If that page cannot be
+reached, `vfox install kotlin@latest` fails rather than guessing a version.
 
 ## Listing
 
@@ -24,9 +24,10 @@ table and takes the first version listed. If that page cannot be reached,
 vfox search kotlin
 ```
 
-`Available` lists the releases from the same table in page order, newest first,
-and marks releases that are already installed. The table is upstream's, so a
-release appears here as soon as JetBrains adds it.
+`Available` lists the `X.Y.Z` releases from the same table in page order, newest
+first, and marks releases that are already installed. The release lines at the
+top of that page, such as `2.4`, are not versions and are skipped. The table is
+upstream's, so a release appears here as soon as JetBrains adds it.
 
 ## Selecting
 
@@ -88,35 +89,10 @@ reason.
 ## Already installed compilers
 
 If a compiler from SDKMAN, asdf, mise, Homebrew, an IDE, the system package
-manager or `KOTLIN_HOME` is already on the machine, vfox can adopt it:
-
-```bash
-vfox link --detect kotlin
-```
-
-This needs vfox 1.1.0 or later (`vfox --version`). vfox shows what the plugin
-found and links what you pick; add `-y` to link everything without asking.
-`vfox list kotlin` then marks those versions `(linked → <path>)` and
-`vfox uninstall` removes only the link, leaving the compiler where it is.
-
-The plugin recognises a compiler home by its `bin/kotlinc` launcher and its
-`build.txt`, and names it after the version in that file, so a detected
-compiler is spelled just like an installed one (for example `2.0.0`). Entries
-under vfox's own directories are never offered. It looks in:
-
-- SDKMAN (`~/.sdkman/candidates/kotlin`), asdf and mise installs
-- Homebrew and Linuxbrew kegs, and the system directories (`/usr/share/kotlinc`, `/opt`, `/usr/local`)
-- IntelliJ IDEA and Toolbox bundles, which keep the compiler under `plugins/kotlin/kotlinc`
-- `KOTLIN_HOME`, and the equivalent Windows locations under `Program Files` and `USERPROFILE`
-
-See [link.md](link.md) for the full list, the naming rules and manual linking.
-To adopt a compiler in a location that is not scanned, point at its home
-directory by hand — the one that holds `bin`:
-
-```bash
-vfox link kotlin@2.0.0-system /opt/my-kotlin
-vfox use --global kotlin@2.0.0-system
-```
+manager or `KOTLIN_HOME` is already on the machine, adopt it instead of
+downloading another copy with `vfox link --detect kotlin` (vfox 1.1.0 or later).
+The locations it searches, how compilers are named and linking by hand are
+described in [link.md](link.md).
 
 ## Java
 

@@ -42,13 +42,14 @@ vfox 加载 `metadata.lua`，在命令需要时调用 hook，并把 `PLUGIN` 和
 | shell hook | `EnvKeys` 应用于选中的版本 |
 
 - `Available` 获取发布详情页面并解析 `tbody tr` / `td b`，返回
-  `{ version, note }` 列表。请求失败时返回空列表而不是抛错，这样离线时
-  `vfox search` 仍可用。
+  `{ version, note }` 列表，只包含 `X.Y.Z` 版本：页面顶部的版本线（如 `2.4`）会被跳过。
+  请求失败时返回空列表而不是抛错，这样离线时 `vfox search` 仍可用。
 - `PreInstall` 用版本号两次格式化 `lib/util.lua` 中的 URL。它发送 HEAD 请求，
   除非返回 200，否则抛出 `Current version information not detected.`。对 1.9.0
-  及以上的版本，它 GET `<url>.sha256` 并把内容作为 `sha256` 返回；否则不返回
-  校验和。结果中的 `version` 是 vfox 安装时使用的名称，因此 `latest` 在这里被
-  解析为具体版本。它还会探测 `lib/util.lua` 中按平台生成的 Kotlin/Native 资源；
+  及以上的版本，它 GET `<url>.sha256` 并把内容作为 `sha256` 返回，失败时抛出
+  `Current version checksum not detected.`；否则不返回校验和。结果中的 `version`
+  是 vfox 安装时使用的名称，因此 `latest` 在这里被解析为具体版本。它还会探测
+  `lib/util.lua` 中按平台生成的 Kotlin/Native 资源；
   HEAD 请求成功时，该归档包会作为 `addition` 返回（JetBrains 发布 `.sha256` 时也一并
   返回），由 vfox 作为第二个包下载并解压。缺少原生资源只会使 `kotlinc-native` 不可用，
   编译器仍会正常安装。

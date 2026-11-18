@@ -3,7 +3,7 @@
 [中文](e2e.md) | [English](../e2e.md)
 
 离线 Lua hook 测试（`tests/*_test.lua`）在 **Test Plugin** 工作流中运行。端到端套件
-则在容器中对真实的 vfox 运行，覆盖 Linux 和 Windows；每个用例使用独立的临时容器。
+则在容器中对真实的 vfox 运行，覆盖 Linux 和 Windows；每次运行使用一个临时容器。
 CI 在标准 runner 上原生运行（Docker 加上 `actions/setup-go` 安装的 Go）。
 `.devcontainer/` 中的开发容器使用相同固定版本的工具，在本地复现 Linux 流程。
 
@@ -12,7 +12,6 @@ CI 在标准 runner 上原生运行（Docker 加上 `actions/setup-go` 安装的
 | 变量                 | 默认值   | 含义                                                     |
 | -------------------- | -------- | -------------------------------------------------------- |
 | `KOTLIN_VERSION`     | `2.0.0`  | 安装并检查的版本（1.9.0 起带校验和）                      |
-| `E2E_MAX_JOBS`       | `3`      | 每台主机并行运行的容器数                                 |
 | `E2E_RETRY_ATTEMPTS` | `3`      | 每个涉及网络的步骤的重试次数（线性退避 10 秒）            |
 
 ## Linux（Ubuntu）
@@ -39,7 +38,8 @@ KOTLIN_VERSION=1.8.22 go test -v -timeout 45m -run TestE2E ./linux
 ## Windows 11
 
 Windows 容器需要处于 Windows 容器模式的 Windows Docker 守护进程。CI 在
-`windows-latest` 上运行；如果守护进程处于 Linux 容器模式，job 会切换引擎。
+`windows-latest` 上运行：若 `docker` 服务已停止，job 会先启动它；守护进程若不处于
+Windows 容器模式，job 会失败。
 在装有 Docker 和 Go 的 Windows 主机上：
 
 ```powershell
@@ -107,6 +107,8 @@ docker run --rm -v "$PWD:/work" -w /work apache/skywalking-eyes:0.9.0 header fix
 5. `vfox use --global` 选中编译器。在新的 shell 中，SDK 的 `bin` 位于 `PATH` 中，
    `vfox env` 导出它，`kotlinc -version` 和 `kotlin -version` 报告请求的版本，
    `vfox current kotlin` 给出选中的版本。
-6. `vfox link --detect kotlin` 找到被复制到 vfox 目录之外并由 `KOTLIN_HOME` 指向的
+6. 在 amd64 上，对 1.9.0 及以上的版本，`kotlinc-native` 位于 `PATH` 中，并且
+   `kotlinc-native -version` 报告相同的版本。
+7. `vfox link --detect kotlin` 找到被复制到 vfox 目录之外并由 `KOTLIN_HOME` 指向的
    编译器，将其纳入，链接会出现在 `vfox list kotlin` 中并标为 `(linked → …)`。
    固定使用的 vfox 1.1.0 是首个支持 `Detect` hook 的版本。
