@@ -4,7 +4,7 @@
 
 What changed in each release. GitHub's release pages list the pull requests.
 
-## Unreleased
+## 0.1.4 (2026-11-18)
 
 - A releases page that cannot be read is now reported as an error: `Available` raises `get Kotlin releases failed: HTTP <status>` (or the connection error) instead of listing no versions, so `vfox search` and `vfox install kotlin@latest` say why. `latest` also stops with a clear message when the page lists no release, instead of indexing an empty list.
 

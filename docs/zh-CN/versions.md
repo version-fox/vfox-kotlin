@@ -12,9 +12,10 @@ vfox install kotlin@2.1.0   # 指定版本
 vfox install kotlin@latest  # Kotlin 发布页上的最新版本
 ```
 
-`latest` 由 `Available` hook 解析：它读取
-[Kotlin 发布详情](https://kotlinlang.org/docs/releases.html#release-details)表格并取
-列出的第一个 `X.Y.Z` 发布版本。如果无法访问该页面，`vfox install kotlin@latest` 会失败，而不会猜测版本。
+`latest` 由 `PreInstall` 解析：它取 `Available` hook 从
+[Kotlin 发布详情](https://kotlinlang.org/docs/releases.html#release-details)表格中列出的
+第一个 `X.Y.Z` 发布版本。如果无法访问该页面，或该页面未列出任何版本，`vfox install kotlin@latest`
+会失败，而不会猜测版本。
 
 ## 列出
 
@@ -55,8 +56,10 @@ kotlinc-native hello.kt -o hello
 | --- | --- | --- |
 | Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0 |
 | Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS x86_64 / arm64 | `kotlin-native-prebuilt-macos-<arch>-<version>.tar.gz` | 2.0.0 |
-| macOS x86_64 / arm64 | `kotlin-native-macos-<arch>-<version>.tar.gz` | 1.9.0 |
+| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0 |
+| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0 |
+| macOS x86_64 | `kotlin-native-macos-x86_64-<version>.tar.gz` | 1.9.0 |
+| macOS arm64 | `kotlin-native-macos-aarch64-<version>.tar.gz` | 1.9.0 |
 | Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0 |
 | Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
 

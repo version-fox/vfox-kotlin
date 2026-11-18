@@ -72,12 +72,12 @@ vfox loads `metadata.lua`, calls a hook when a command needs it, and puts
 - `PreUse` and `PostInstall` are no-ops; vfox matches an installed version and
   applies `EnvKeys` without help from the plugin.
 - `Detect` scans SDKMAN, asdf, mise, Homebrew, IDE bundles, the system
-  directories and `KOTLIN_HOME` for compiler homes with `bin/kotlinc` and
-  `build.txt`. It returns `{ version, path, note }`; the version comes from
-  `build.txt` (falling back to the directory name), so a detected compiler is
-  named exactly like an installed one. Paths under `.vfox` are skipped, and
-  results are deduplicated and sorted. The hook needs vfox 1.1.0; older vfox
-  simply ignores it.
+  directories and `KOTLIN_HOME` for compiler homes with `bin/kotlinc` and either
+  `build.txt` or `lib/kotlin-compiler.jar`. It returns `{ version, path, note }`;
+  the version comes from `build.txt` (falling back to the directory name), so a
+  detected compiler is named exactly like an installed one. Paths under `.vfox`
+  are skipped, and results are deduplicated and sorted. The hook needs vfox
+  1.1.0; older vfox simply ignores it.
 
 ## Tests
 

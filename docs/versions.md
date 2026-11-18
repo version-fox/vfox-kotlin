@@ -13,10 +13,11 @@ vfox install kotlin@2.1.0   # a specific release
 vfox install kotlin@latest  # the newest release on the Kotlin release page
 ```
 
-`latest` is resolved by the `Available` hook: it reads the
+`latest` is resolved by `PreInstall`, which takes the first `X.Y.Z` release that
+the `Available` hook lists from the
 [Kotlin release details](https://kotlinlang.org/docs/releases.html#release-details)
-table and takes the first `X.Y.Z` release listed. If that page cannot be
-reached, `vfox install kotlin@latest` fails rather than guessing a version.
+table. If that page cannot be reached, or lists no release,
+`vfox install kotlin@latest` fails rather than guessing a version.
 
 ## Listing
 
@@ -60,8 +61,10 @@ kotlinc-native hello.kt -o hello
 | --- | --- | --- |
 | Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0 |
 | Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS x86_64 / arm64 | `kotlin-native-prebuilt-macos-<arch>-<version>.tar.gz` | 2.0.0 |
-| macOS x86_64 / arm64 | `kotlin-native-macos-<arch>-<version>.tar.gz` | 1.9.0 |
+| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0 |
+| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0 |
+| macOS x86_64 | `kotlin-native-macos-x86_64-<version>.tar.gz` | 1.9.0 |
+| macOS arm64 | `kotlin-native-macos-aarch64-<version>.tar.gz` | 1.9.0 |
 | Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0 |
 | Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
 
