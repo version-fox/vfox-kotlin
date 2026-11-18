@@ -63,10 +63,10 @@ vfox 加载 `metadata.lua`，在命令需要时调用 hook，并把 `PLUGIN` 和
 - `PreUse` 和 `PostInstall` 是空操作；vfox 无需插件帮助即可匹配已安装版本并应用
   `EnvKeys`。
 - `Detect` 扫描 SDKMAN、asdf、mise、Homebrew、IDE 自带目录、系统目录和 `KOTLIN_HOME`，
-  寻找同时包含 `bin/kotlinc` 和 `build.txt` 的编译器目录。它返回
-  `{ version, path, note }`，版本取自 `build.txt`（缺失时回退到目录名），因此检测到的
-  编译器命名与安装时一致。`.vfox` 下的路径会被跳过，结果去重并排序。该 hook 需要
-  vfox 1.1.0；旧版 vfox 会直接忽略它。
+  寻找包含 `bin/kotlinc`，并且还包含 `build.txt` 或 `lib/kotlin-compiler.jar` 之一的
+  编译器目录。它返回 `{ version, path, note }`，版本取自 `build.txt`（缺失时回退到目录名），
+  因此检测到的编译器命名与安装时一致。`.vfox` 下的路径会被跳过，结果去重并排序。该 hook
+  需要 vfox 1.1.0；旧版 vfox 会直接忽略它。
 
 ## 测试
 

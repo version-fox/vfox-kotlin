@@ -43,25 +43,32 @@ Remember that `kotlinc` needs Java on `PATH` (see [versions.md](versions.md#java
 
 ## When kotlin is already added
 
-`vfox add kotlin` replaces the existing plugin. To keep the published one as
-well, give the source build an alias:
+`vfox add kotlin` refuses with `plugin named kotlin already exists`. You can
+replace the plugin, or add the source build next to it.
+
+To replace it, `vfox remove kotlin` comes first. It also removes the compilers
+installed through the plugin, so install them again afterwards.
+
+To keep both, give the source build another name:
 
 ```bash
 vfox add kotlin --source ./kotlin.zip --alias kotlin-dev
 vfox install kotlin-dev@latest
+vfox remove -y kotlin-dev # removes only kotlin-dev and what it installed
 ```
 
 ## Updating
 
-Rebuild the ZIP and add it again. With an alias, update only that plugin so the
-published one is left alone:
+Rebuild the ZIP and add it again. A plugin added under its own name has to be
+removed first, which takes its installed compilers with it, so the alias is the
+easier route when you update often:
 
 ```bash
-vfox remove kotlin-dev
+vfox remove -y kotlin-dev
 vfox add kotlin --source ./kotlin.zip --alias kotlin-dev
 ```
 
-`vfox update kotlin` compares the version in `metadata.lua` with the installed
-one, so it does not replace a source build from the same commit.
+`vfox update kotlin` compares the version in `metadata.lua` with the latest
+published one, so it leaves a source build of the same version alone.
 
 To work on the plugin, see [development.md](development.md).

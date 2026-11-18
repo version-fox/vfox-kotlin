@@ -4,7 +4,7 @@
 
 每个版本的用户可感知变更。GitHub 发布页列出了拉取请求。
 
-## 未发布
+## 0.1.4（2026-11-18）
 
 - 发布页无法读取时现在会报错：`Available` 抛出 `get Kotlin releases failed: HTTP <状态码>`（或连接错误），而不是列出空的版本列表，因此 `vfox search` 和 `vfox install kotlin@latest` 会说明原因。发布页未列出任何版本时，`latest` 也会给出明确的错误，而不再索引空列表。
 

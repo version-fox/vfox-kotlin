@@ -5,8 +5,9 @@
 ## `kotlinc: command not found`
 
 The plugin adds `<sdk>/bin` to `PATH`, but vfox's variables are applied by a
-shell hook. Run `vfox init` once and restart the shell, or follow the
-[quick start](https://vfox.dev/guides/quick-start.html) for your shell. Then
+shell hook. Hook vfox into your shell with `vfox activate`: for bash, add
+`eval "$(vfox activate bash)"` to `~/.bashrc`, then restart the shell. The
+[quick start](https://vfox.dev/guides/quick-start.html) covers other shells. Then
 check that a version is selected with `vfox current kotlin` and that the
 variables are exported with `vfox env -s bash` (or your shell).
 
@@ -56,12 +57,9 @@ cause; retry, or use `vfox --debug install kotlin@<version>` to see the request.
 
 `latest` reads the Kotlin release table at kotlinlang.org. If that page cannot
 be read, vfox stops with `get Kotlin releases failed: HTTP <status>` (or a
-connection error); install a version by number instead.
-
-On 0.1.2 and earlier, `latest` could also resolve to a release line such as
-`2.4`, which is not a release, and the install failed with `Current version
-information not detected.`. Plugin 0.1.3 fixed that: run `vfox update kotlin`
-and try again.
+connection error). If the page is read but lists no `X.Y.Z` release, vfox stops
+with `No Kotlin release is listed, so latest cannot be resolved.` In both cases,
+install a version by number instead.
 
 ## The compiler is installed but the version is old
 

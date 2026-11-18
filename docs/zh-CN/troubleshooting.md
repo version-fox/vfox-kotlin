@@ -4,9 +4,9 @@
 
 ## `kotlinc: command not found`
 
-插件会把 `<sdk>/bin` 加入 `PATH`，但 vfox 的变量由 shell hook 应用。请先运行一次
-`vfox init` 并重启 shell，或按照你所使用 shell 的
-[快速开始](https://vfox.dev/guides/quick-start.html) 操作。然后用
+插件会把 `<sdk>/bin` 加入 `PATH`，但 vfox 的变量由 shell hook 应用。请用 `vfox activate`
+把 vfox 接入 shell：bash 下在 `~/.bashrc` 中加入 `eval "$(vfox activate bash)"`，然后重启 shell。
+其他 shell 请参照[快速开始](https://vfox.dev/guides/quick-start.html)。然后用
 `vfox current kotlin` 检查是否已选中版本，用 `vfox env -s bash`（或你的 shell）查看导出的变量。
 
 ## `kotlinc-native: command not found`
@@ -50,11 +50,9 @@ arm64 版本）。如果 `kotlinc` 可用但 `kotlinc-native` 不可用，请用
 ## `vfox install kotlin@latest` 失败
 
 `latest` 会读取 kotlinlang.org 上的 Kotlin 发布表格。如果无法读取该页面，vfox 会
-以 `get Kotlin releases failed: HTTP <状态码>`（或连接错误）停止；请改用具体版本号安装。
-
-0.1.2 及更早版本中，`latest` 还可能被解析为 `2.4` 这类版本线（它不是发布版本），安装因此以
-`Current version information not detected.` 失败。插件 0.1.3 已修复该问题：运行
-`vfox update kotlin` 后重试即可。
+以 `get Kotlin releases failed: HTTP <状态码>`（或连接错误）停止。如果页面可以读取，但没有
+列出任何 `X.Y.Z` 发布版本，vfox 会以 `No Kotlin release is listed, so latest cannot be resolved.`
+停止。这两种情况都请改用具体版本号安装。
 
 ## 编译器已安装但版本较旧
 
