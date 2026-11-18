@@ -54,8 +54,9 @@ cause; retry, or use `vfox --debug install kotlin@<version>` to see the request.
 
 ## `vfox install kotlin@latest` fails
 
-`latest` reads the Kotlin release table at kotlinlang.org. If that page is
-unavailable, install a version by number instead.
+`latest` reads the Kotlin release table at kotlinlang.org. If that page cannot
+be read, vfox stops with `get Kotlin releases failed: HTTP <status>` (or a
+connection error); install a version by number instead.
 
 On 0.1.2 and earlier, `latest` could also resolve to a release line such as
 `2.4`, which is not a release, and the install failed with `Current version

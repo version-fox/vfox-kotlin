@@ -24,10 +24,14 @@ local page = [[
 
 local requests = {}
 local failNext = false
+local networkDown = false
 local plugin = test.load({
     http = function(request)
         table.insert(requests, request.url)
         if request.url:find("kotlinlang.org", 1, true) then
+            if networkDown then
+                return nil, "dial tcp: lookup kotlinlang.org: no such host"
+            end
             if failNext then
                 return { status_code = 503, body = "unavailable" }
             end
@@ -47,9 +51,19 @@ assert(versions[1] == "2.1.0", "the first listed version must be 2.1.0")
 assert(versions[2] == "2.0.0", "the second listed version must be 2.0.0")
 assert(#requests == 1 and requests[1]:find("releases.html", 1, true), "Available must request the release details page")
 
--- A failed or unparsable page yields an empty list, not an error.
+-- A failed request raises an error that names the request and its status. It must not look like an empty list.
 failNext = true
-assert(#plugin:Available({}) == 0, "a failed request must produce no versions")
+local ok, err = pcall(plugin.Available, plugin, {})
+assert(not ok, "a failed request must raise an error")
+assert(tostring(err):find("get Kotlin releases failed: HTTP 503", 1, true), "unexpected error: " .. tostring(err))
 failNext = false
 
-print("PASS: Available lists versions from the release page")
+-- A request that never gets an answer raises the connection error.
+networkDown = true
+ok, err = pcall(plugin.Available, plugin, {})
+assert(not ok, "a connection failure must raise an error")
+assert(tostring(err):find("get Kotlin releases failed: ", 1, true), "unexpected error: " .. tostring(err))
+assert(tostring(err):find("no such host", 1, true), "the connection error must be included: " .. tostring(err))
+networkDown = false
+
+print("PASS: Available lists versions and raises when the releases page cannot be read")

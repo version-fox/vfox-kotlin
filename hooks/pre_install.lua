@@ -57,6 +57,9 @@ function PLUGIN:PreInstall(ctx)
 
     if version == "latest" then
         local lists = self:Available({})
+        if #lists == 0 then
+            error("No Kotlin release is listed, so latest cannot be resolved.")
+        end
         version = lists[1].version
     end
     local url = util.DownloadURL:format(version, version)

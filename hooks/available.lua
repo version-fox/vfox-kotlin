@@ -14,15 +14,19 @@
 
 local html = require("html")
 local http = require("http")
---- Return all available versions provided by this plugin
+--- Return all available versions provided by this plugin.
+--- Raises an error naming the failed request when the releases page cannot be read.
 --- @param ctx table Empty table used as context, for future extension
 --- @return table Descriptions of available versions and accompanying tool descriptions
 function PLUGIN:Available(ctx)
     local resp, err = http.get({
         url = "https://kotlinlang.org/docs/releases.html#release-details",
     })
-    if err ~= nil or resp.status_code ~= 200 then
-        return {}
+    if err ~= nil then
+        error("get Kotlin releases failed: " .. tostring(err))
+    end
+    if resp.status_code ~= 200 then
+        error("get Kotlin releases failed: HTTP " .. tostring(resp.status_code))
     end
     local result = {}
     html.parse(resp.body):find("tbody tr"):each(function(i, sel)
