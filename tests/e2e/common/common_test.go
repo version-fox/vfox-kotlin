@@ -15,7 +15,10 @@
 package common
 
 import (
+	"strconv"
+	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -85,6 +88,45 @@ func TestSanitizeAndContainerName(t *testing.T) {
 	second := ContainerName("v2_0_0")
 	assert.Contains(t, first, "vfox-kotlin-e2e-v2_0_0-")
 	assert.NotEqual(t, first, second)
+}
+
+func TestRunCasesLimitsConcurrency(t *testing.T) {
+	for _, tt := range []struct {
+		env  string
+		want int
+	}{{"", 3}, {"1", 1}, {"2", 2}} {
+		t.Run("E2E_MAX_JOBS="+tt.env, func(t *testing.T) {
+			t.Setenv("E2E_MAX_JOBS", tt.env)
+			var running, peak, started atomic.Int32
+			ready := make(chan struct{})
+			cases := make([]Case, 6)
+			for i := range cases {
+				cases[i] = Case{Name: strconv.Itoa(i), Run: func(t *testing.T) {
+					n := running.Add(1)
+					defer running.Add(-1)
+					for {
+						p := peak.Load()
+						if n <= p || peak.CompareAndSwap(p, n) {
+							break
+						}
+					}
+					// Each case waits until want cases have started. Those cases
+					// hold every slot while they wait, so the peak reaches want
+					// only if the limit lets that many run at once.
+					if started.Add(1) == int32(tt.want) {
+						close(ready)
+					}
+					select {
+					case <-ready:
+					case <-time.After(10 * time.Second):
+						t.Errorf("only %d cases started, want %d", started.Load(), tt.want)
+					}
+				}}
+			}
+			RunCases(t, cases)
+			assert.Equal(t, int32(tt.want), peak.Load(), "cases running at once")
+		})
+	}
 }
 
 func TestMaxJobsAndAttempts(t *testing.T) {

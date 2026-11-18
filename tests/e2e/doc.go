@@ -14,8 +14,9 @@
 
 // Package common holds the target-independent helpers of the Kotlin E2E
 // suites. The linux and windows packages drive a real vfox in throwaway
-// containers; common only decides what version to test, how to name
-// containers and how to retry network-touching steps.
+// containers, one case per container; common decides which versions to test,
+// how many cases run at once, how to name containers and how to retry
+// network-touching steps.
 //
 // Run the offline unit tests with `go test -short ./...`; the container suites
 // are skipped in short mode and run with `go test -run TestE2E ./linux` or

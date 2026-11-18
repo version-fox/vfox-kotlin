@@ -28,9 +28,12 @@ import (
 	"github.com/version-fox/vfox-kotlin/tests/e2e/common"
 )
 
-// TestE2E builds the target image once and drives one throwaway container
-// through setup -> install -> verify. Scope it while iterating with
-// KOTLIN_VERSION=1.8.22 go test -v -run TestE2E ./linux.
+// TestE2E builds the target image once and runs one case per Kotlin release,
+// each in a container of its own. The release under test goes through setup
+// -> install -> verify. The pre-1.9.0 release only checks its install, which
+// takes the no-checksum branch. E2E_MAX_JOBS caps how many containers run at
+// once. Scope it while iterating with KOTLIN_VERSION=1.8.22 go test -v -run
+// TestE2E ./linux.
 func TestE2E(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skip container E2E in short mode")
@@ -70,34 +73,59 @@ func TestE2E(t *testing.T) {
 		t.Fatalf("built tag %q, want %q", tag, image)
 	}
 
-	ctr, err := tc.GenericContainer(ctx, tc.GenericContainerRequest{
-		ContainerRequest: tc.ContainerRequest{
-			Image: image,
-			Name:  common.ContainerName("linux-" + common.Sanitize(common.Version())),
-			Env:   map[string]string{"KOTLIN_VERSION": common.Version()},
+	// start gives a case its own throwaway container, removed when the case ends.
+	start := func(t *testing.T, version string) tc.Container {
+		t.Helper()
+		ctr, err := tc.GenericContainer(ctx, tc.GenericContainerRequest{
+			ContainerRequest: tc.ContainerRequest{
+				Image: image,
+				Name:  common.ContainerName("linux-" + common.Sanitize(version)),
+				Env:   map[string]string{"KOTLIN_VERSION": version},
+			},
+			Started: true,
+		})
+		if err != nil {
+			t.Fatalf("start container: %v", err)
+		}
+		t.Cleanup(func() { _ = ctr.Terminate(context.Background()) })
+		return ctr
+	}
+
+	cases := []common.Case{{
+		Name: common.Version(),
+		Run: func(t *testing.T) {
+			ctr := start(t, common.Version())
+			ctx, cancel := context.WithTimeout(ctx, 20*time.Minute)
+			defer cancel()
+
+			t.Logf("=== linux/%s, kotlin@%s ===", arch, common.Version())
+			setupVfox(ctx, t, ctr, arch)
+			installKotlin(ctx, t, ctr, common.Version())
+			verifySearch(ctx, t, ctr, common.Version())
+			checkMissingVersionRejected(ctx, t, ctr)
+			useKotlin(ctx, t, ctr, common.Version())
+			verifyToolchain(ctx, t, ctr, common.Version())
+			if common.HasNative(common.Version(), arch) {
+				verifyNative(ctx, t, ctr, common.Version())
+			}
+			checkDetect(ctx, t, ctr)
 		},
-		Started: true,
-	})
-	if err != nil {
-		t.Fatalf("start container: %v", err)
+	}}
+	// The pre-1.9.0 release has no checksum asset, so PreInstall takes the
+	// other branch. It runs in a container of its own unless it is already the
+	// release under test.
+	if common.Version() != common.LegacyVersion {
+		cases = append(cases, common.Case{
+			Name: common.LegacyVersion,
+			Run: func(t *testing.T) {
+				ctr := start(t, common.LegacyVersion)
+				ctx, cancel := context.WithTimeout(ctx, 20*time.Minute)
+				defer cancel()
+
+				setupVfox(ctx, t, ctr, arch)
+				installKotlin(ctx, t, ctr, common.LegacyVersion)
+			},
+		})
 	}
-	t.Cleanup(func() { _ = ctr.Terminate(context.Background()) })
-
-	ctx, cancel := context.WithTimeout(ctx, 20*time.Minute)
-	defer cancel()
-
-	t.Logf("=== linux/%s, kotlin@%s ===", arch, common.Version())
-	setupVfox(ctx, t, ctr, arch)
-	installKotlin(ctx, t, ctr, common.Version())
-	verifySearch(ctx, t, ctr, common.Version())
-	checkMissingVersionRejected(ctx, t, ctr)
-	useKotlin(ctx, t, ctr, common.Version())
-	verifyToolchain(ctx, t, ctr, common.Version())
-	if common.HasNative(common.Version(), arch) {
-		verifyNative(ctx, t, ctr, common.Version())
-	}
-	checkDetect(ctx, t, ctr)
-
-	// The pre-1.9.0 branch of PreInstall has no checksum asset.
-	installKotlin(ctx, t, ctr, common.LegacyVersion)
+	common.RunCases(t, cases)
 }
