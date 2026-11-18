@@ -43,8 +43,9 @@ A found compiler is named the way `vfox install` names it: the version in its
 `bin/../build.txt`, such as `1.9.0` or `2.0.0`. A directory counts as a
 compiler home when it holds both a `bin/kotlinc` launcher (or `kotlinc.bat`
 on Windows) and a `build.txt` or `lib/kotlin-compiler.jar`. If `build.txt` is
-missing, the version in the directory name is used. Results are deduplicated
-and sorted by version, so the list is stable.
+missing, the version is taken from the directory name if that starts with one,
+such as `2.0.0` or `2.0.0-system`; a home with neither is skipped. Results are
+deduplicated and sorted by version, so the list is stable.
 
 ## Linking by hand
 

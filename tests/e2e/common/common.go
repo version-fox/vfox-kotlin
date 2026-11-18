@@ -25,6 +25,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -115,6 +116,36 @@ func MaxJobs(def int) int {
 		}
 	}
 	return def
+}
+
+// DefaultMaxJobs is how many cases run at once when E2E_MAX_JOBS is unset.
+const DefaultMaxJobs = 3
+
+// Case is one independent run of a suite, usually one Kotlin release in its
+// own container. Run is the body of the subtest called Name.
+type Case struct {
+	Name string
+	Run  func(t *testing.T)
+}
+
+// RunCases runs each case as a subtest and keeps at most MaxJobs of them
+// running at once. A case holds its slot until its subtest finishes, so the
+// containers the cases start never exceed E2E_MAX_JOBS. Cases start in the
+// order given, and a failing case does not stop the others.
+func RunCases(t *testing.T, cases []Case) {
+	t.Helper()
+	slots := make(chan struct{}, MaxJobs(DefaultMaxJobs))
+	var wg sync.WaitGroup
+	for _, c := range cases {
+		slots <- struct{}{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			defer func() { <-slots }()
+			t.Run(c.Name, c.Run)
+		}()
+	}
+	wg.Wait()
 }
 
 // RetryAttempts is the number of tries for network-touching steps.

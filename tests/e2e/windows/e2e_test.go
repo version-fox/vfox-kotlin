@@ -29,9 +29,12 @@ import (
 	"github.com/version-fox/vfox-kotlin/tests/e2e/common"
 )
 
-// TestE2E builds the Windows target image once and drives one throwaway
-// container through setup -> install -> verify. It needs a Windows Docker
-// daemon in Windows-container mode; CI runs it on windows-latest.
+// TestE2E builds the Windows target image once and runs one case per Kotlin
+// release, each in a container of its own, as the Linux suite does. The
+// release under test goes through the whole flow; the pre-1.9.0 release only
+// checks its install. It needs a Windows Docker daemon in Windows-container
+// mode; CI runs it on windows-latest. E2E_MAX_JOBS caps how many containers
+// run at once.
 func TestE2E(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skip container E2E in short mode")
@@ -77,33 +80,60 @@ func TestE2E(t *testing.T) {
 		t.Fatalf("built tag %q, want %q", tag, image)
 	}
 
-	ctr, err := provider.RunContainer(ctx, tc.ContainerRequest{
-		Image:         image,
-		ImagePlatform: platform,
-		Name:          common.ContainerName("windows-" + common.Sanitize(common.Version())),
-		Env:           map[string]string{"KOTLIN_VERSION": common.Version()},
-	})
-	if err != nil {
-		t.Fatalf("start container: %v", err)
+	// start gives a case its own throwaway container, removed when the case ends.
+	start := func(t *testing.T, version string) tc.Container {
+		t.Helper()
+		ctr, err := provider.RunContainer(ctx, tc.ContainerRequest{
+			Image:         image,
+			ImagePlatform: platform,
+			Name:          common.ContainerName("windows-" + common.Sanitize(version)),
+			Env:           map[string]string{"KOTLIN_VERSION": version},
+		})
+		if err != nil {
+			t.Fatalf("start container: %v", err)
+		}
+		t.Cleanup(func() { _ = ctr.Terminate(context.Background()) })
+		return ctr
 	}
-	t.Cleanup(func() { _ = ctr.Terminate(context.Background()) })
 
-	ctx, cancel := context.WithTimeout(ctx, 30*time.Minute)
-	defer cancel()
+	cases := []common.Case{{
+		Name: common.Version(),
+		Run: func(t *testing.T) {
+			ctr := start(t, common.Version())
+			ctx, cancel := context.WithTimeout(ctx, 30*time.Minute)
+			defer cancel()
 
-	t.Logf("=== windows/%s, kotlin@%s ===", arch, common.Version())
-	box := setupSlotEnv(ctx, t, ctr, strings.ToLower(common.Sanitize(common.Version())))
-	setupVfox(ctx, t, ctr, box, arch)
-	activation := fetchActivation(ctx, t, ctr, box)
-	installKotlin(ctx, t, ctr, box, common.Version())
-	verifySearch(ctx, t, ctr, box, common.Version())
-	checkMissingVersionRejected(ctx, t, ctr, box)
-	useKotlin(ctx, t, ctr, box, activation, common.Version())
-	verifyToolchain(ctx, t, ctr, box, activation, common.Version())
-	if common.HasNative(common.Version(), arch) {
-		verifyNative(ctx, t, ctr, box, activation, common.Version())
+			t.Logf("=== windows/%s, kotlin@%s ===", arch, common.Version())
+			box := setupSlotEnv(ctx, t, ctr, strings.ToLower(common.Sanitize(common.Version())))
+			setupVfox(ctx, t, ctr, box, arch)
+			activation := fetchActivation(ctx, t, ctr, box)
+			installKotlin(ctx, t, ctr, box, common.Version())
+			verifySearch(ctx, t, ctr, box, common.Version())
+			checkMissingVersionRejected(ctx, t, ctr, box)
+			useKotlin(ctx, t, ctr, box, activation, common.Version())
+			verifyToolchain(ctx, t, ctr, box, activation, common.Version())
+			if common.HasNative(common.Version(), arch) {
+				verifyNative(ctx, t, ctr, box, activation, common.Version())
+			}
+			checkDetect(ctx, t, ctr, box, activation)
+		},
+	}}
+	// The pre-1.9.0 release has no checksum asset, so PreInstall takes the
+	// other branch. It runs in a container of its own unless it is already the
+	// release under test.
+	if common.Version() != common.LegacyVersion {
+		cases = append(cases, common.Case{
+			Name: common.LegacyVersion,
+			Run: func(t *testing.T) {
+				ctr := start(t, common.LegacyVersion)
+				ctx, cancel := context.WithTimeout(ctx, 30*time.Minute)
+				defer cancel()
+
+				box := setupSlotEnv(ctx, t, ctr, strings.ToLower(common.Sanitize(common.LegacyVersion)))
+				setupVfox(ctx, t, ctr, box, arch)
+				installKotlin(ctx, t, ctr, box, common.LegacyVersion)
+			},
+		})
 	}
-	checkDetect(ctx, t, ctr, box, activation)
-
-	installKotlin(ctx, t, ctr, box, common.LegacyVersion)
+	common.RunCases(t, cases)
 }

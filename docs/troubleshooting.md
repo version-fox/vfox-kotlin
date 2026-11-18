@@ -45,10 +45,22 @@ usually because the version does not exist or GitHub could not be reached.
 Check the version with `vfox search kotlin` and retry; `vfox --debug install
 kotlin@<version>` shows the request vfox made.
 
+## `Current version checksum not detected.`
+
+From 1.9.0 on, `PreInstall` also downloads the `.sha256` file that JetBrains
+publishes beside each archive. If that download fails, the install stops with
+this message. A network problem or a proxy that blocks GitHub is the usual
+cause; retry, or use `vfox --debug install kotlin@<version>` to see the request.
+
 ## `vfox install kotlin@latest` fails
 
 `latest` reads the Kotlin release table at kotlinlang.org. If that page is
 unavailable, install a version by number instead.
+
+On 0.1.2 and earlier, `latest` could also resolve to a release line such as
+`2.4`, which is not a release, and the install failed with `Current version
+information not detected.`. Plugin 0.1.3 fixed that: run `vfox update kotlin`
+and try again.
 
 ## The compiler is installed but the version is old
 

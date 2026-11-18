@@ -4,7 +4,7 @@
 
 每个版本的用户可感知变更。GitHub 发布页列出了拉取请求。
 
-## 未发布
+## 0.1.3（2026-11-18）
 
 - 修复 `latest` 报 `Current version information not detected.` 而安装失败的问题：发布页第一个表格列出的版本线（如 `2.4`）曾被 `Available` 当作版本，`latest` 因此解析为 `2.4`。现在 `Available` 只保留 `X.Y.Z` 形式的发布版本，`latest` 安装最新的发布版本。
 

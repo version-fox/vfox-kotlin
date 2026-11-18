@@ -90,8 +90,7 @@ vfox link --detect kotlin
 
 维护者可以在默认分支上从 **Actions → Plugin → Run workflow** 发布，填入不带 `v`
 前缀的稳定版本号。共享工作流会更新 `metadata.lua`、创建版本提交和标签，并在本仓库
-发布 ZIP 和 manifest。无需本地打标签或额外的 release token。拉取请求只运行检查；
-PR 标题不再触发发布。
+发布 ZIP 和 manifest。无需本地打标签或额外的 release token。拉取请求只运行检查。
 
 当 `PLUGIN.version` 与标签一致时，推送版本标签也可以发布。若发布失败，重新运行
 原来失败的 job 即可续跑。

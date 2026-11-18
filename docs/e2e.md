@@ -12,9 +12,18 @@ the stock runners (Docker plus Go from `actions/setup-go`). The dev container in
 
 | Variable              | Default  | Meaning                                                     |
 | --------------------- | -------- | ----------------------------------------------------------- |
-| `KOTLIN_VERSION`      | `2.0.0`  | Release installed and checked (from 1.9.0 on, with checksum) |
-| `E2E_MAX_JOBS`        | `3`      | Parallel containers per host                                |
+| `KOTLIN_VERSION`      | `2.0.0`  | Release under test; its case runs every step (from 1.9.0 on, with checksum) |
+| `E2E_MAX_JOBS`        | `3`      | Containers (cases) that run at once in one `go test` run    |
 | `E2E_RETRY_ATTEMPTS`  | `3`      | Attempts per network-touching step (10s linear backoff)      |
+
+Each platform runs two cases, one container each:
+
+- the release under test (`KOTLIN_VERSION`) runs every step below;
+- `1.8.22`, the last release before the `.sha256` assets, runs steps 1 and 3 only.
+  It gets no case of its own when it is the release under test.
+
+With the default `E2E_MAX_JOBS=3` both cases run at once. `E2E_MAX_JOBS=1` runs
+them one after the other.
 
 ## Linux (Ubuntu)
 
@@ -40,8 +49,9 @@ a ZIP, then drives the install and verification through `bash` exec calls.
 ## Windows 11
 
 Windows containers need a Windows Docker daemon in Windows-container mode.
-CI runs the suite on `windows-latest`; the job switches the engine if the
-daemon is in Linux-container mode. From a Windows host with Docker and Go:
+CI runs the suite on `windows-latest`: the job starts the `docker` service if
+it is stopped, and fails unless the daemon reports Windows-container mode. From
+a Windows host with Docker and Go:
 
 ```powershell
 cd tests/e2e
@@ -100,21 +110,25 @@ docker run --rm -v "$PWD:/work" -w /work apache/skywalking-eyes:0.9.0 header fix
 
 ## What the suite verifies
 
-Both platforms run the same flow:
+Both platforms run the same steps. Every case runs steps 1 and 3; the release
+under test also runs steps 2 and 4 to 7:
 
 1. vfox is installed from a pinned, checksum-checked archive and the local
    `kotlin` plugin is registered from this checkout — not from the registry.
 2. `vfox search kotlin` lists the installed release.
 3. `vfox install kotlin@<version>` installs under that exact name. For 1.9.0
    and newer, vfox prints `Verifying checksum <64 hex digits>…`; for older
-   releases it reports that no checksum is provided. Both branches are run.
+   releases it reports that no checksum is provided. 2.0.0 covers the first
+   branch and 1.8.22 the second.
 4. Installing a release JetBrains never published fails in `PreInstall`'s HEAD
    check.
 5. `vfox use --global` selects the compiler. In a fresh shell the SDK's `bin`
    is on `PATH`, `vfox env` exports it, `kotlinc -version` and
    `kotlin -version` report the requested version, and `vfox current kotlin`
    names the selection.
-6. `vfox link --detect kotlin` finds a compiler copied outside vfox's own
+6. On amd64, for releases from 1.9.0 on, `kotlinc-native` is on `PATH` and
+   `kotlinc-native -version` reports the same release.
+7. `vfox link --detect kotlin` finds a compiler copied outside vfox's own
    directories and pointed to by `KOTLIN_HOME`, links it, and the link shows up
    in `vfox list kotlin` as `(linked → …)`. The pinned vfox 1.1.0 is the first
    release with the `Detect` hook.
