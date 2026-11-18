@@ -4,6 +4,10 @@
 
 每个版本的用户可感知变更。GitHub 发布页列出了拉取请求。
 
+## 未发布
+
+- 修复 `latest` 报 `Current version information not detected.` 而安装失败的问题：发布页第一个表格列出的版本线（如 `2.4`）曾被 `Available` 当作版本，`latest` 因此解析为 `2.4`。现在 `Available` 只保留 `X.Y.Z` 形式的发布版本，`latest` 安装最新的发布版本。
+
 ## 0.1.2（2026-11-17）
 
 - 将 Kotlin/Native 与 JVM 编译器一起安装。`PreInstall` 在有预编译归档包的主机上把 JetBrains 的原生编译器作为附加包下载，`EnvKeys` 把它的 `bin` 目录加入 `PATH`，于是 `kotlinc-native`、`konanc` 和 `klib` 与 `kotlinc` 一同可用。资源名称随版本选择（Kotlin 2.0 起有变化），并在 JetBrains 发布 `.sha256` 时单独校验。需要 vfox 1.0.0 或更新版本；没有原生编译包的主机仍可正常安装 JVM 编译器。Linux 和 Windows 的 E2E 套件现在会检查 `kotlinc-native -version`。

@@ -27,10 +27,13 @@ function PLUGIN:Available(ctx)
     local result = {}
     html.parse(resp.body):find("tbody tr"):each(function(i, sel)
         local version = sel:find("td b"):first():text()
-        table.insert(result, {
-            version = version,
-            note = "",
-        })
+        -- The first table of the page lists release lines such as "2.4"; only X.Y.Z entries are releases.
+        if version:match("^%d+%.%d+%.%d+$") then
+            table.insert(result, {
+                version = version,
+                note = "",
+            })
+        end
     end)
     return result
 end
