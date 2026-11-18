@@ -45,19 +45,23 @@ vfox loads `metadata.lua`, calls a hook when a command needs it, and puts
 - `Available` fetches the release details page and parses `tbody tr` / `td b`.
   It returns a list of `{ version, note }` for the `X.Y.Z` entries only: the
   release lines at the top of the page, such as `2.4`, are skipped. A failed
-  request returns an empty list rather than raising, so `vfox search` stays
-  usable offline.
+  request raises `get Kotlin releases failed: HTTP <status>` (or the connection
+  error) instead of returning an empty list, so `vfox search` and `latest` say
+  why no versions are listed. A page that parses to no releases returns an
+  empty list.
 - `PreInstall` formats `lib/util.lua`'s URL with the version twice. It sends a
   HEAD request and raises `Current version information not detected.` unless
   the answer is 200. For a version at or above 1.9.0 it GETs `<url>.sha256` and
   returns its body as `sha256`, raising `Current version checksum not detected.`
   if that fails; otherwise it returns no checksum. `version` in
   the result is the name vfox installs under, which is why `latest` is resolved
-  to a concrete release here. It also probes the per-platform Kotlin/Native
-  asset from `lib/util.lua`; when the HEAD request succeeds, the archive is
-  returned in `addition` (with its own `.sha256` when one exists), so vfox
-  downloads and extracts it as a second package. An absent native asset only
-  leaves out `kotlinc-native`; the compiler still installs.
+  to a concrete release here; when the list is empty, `latest` raises
+  `No Kotlin release is listed, so latest cannot be resolved.` It also probes
+  the per-platform Kotlin/Native asset from `lib/util.lua`; when the HEAD
+  request succeeds, the archive is returned in `addition` (with its own
+  `.sha256` when one exists), so vfox downloads and extracts it as a second
+  package. An absent native asset only leaves out `kotlinc-native`; the
+  compiler still installs.
 - `EnvKeys` returns `{ key = "PATH", value = ctx.path .. "/bin" }` and one more
   PATH entry for every non-main package in `ctx.sdkInfo`. vfox strips the
   top-level `kotlinc` directory of the archive, so the launchers sit directly

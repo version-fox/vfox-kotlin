@@ -49,8 +49,8 @@ arm64 版本）。如果 `kotlinc` 可用但 `kotlinc-native` 不可用，请用
 
 ## `vfox install kotlin@latest` 失败
 
-`latest` 会读取 kotlinlang.org 上的 Kotlin 发布表格。如果该页面不可用，请改用
-具体版本号安装。
+`latest` 会读取 kotlinlang.org 上的 Kotlin 发布表格。如果无法读取该页面，vfox 会
+以 `get Kotlin releases failed: HTTP <状态码>`（或连接错误）停止；请改用具体版本号安装。
 
 0.1.2 及更早版本中，`latest` 还可能被解析为 `2.4` 这类版本线（它不是发布版本），安装因此以
 `Current version information not detected.` 失败。插件 0.1.3 已修复该问题：运行
