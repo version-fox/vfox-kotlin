@@ -54,10 +54,11 @@ function util:NativePlatform(osType, archType)
     return platform, extension
 end
 
---- URL of the Kotlin/Native prebuilt archive for a release. Kotlin 2.0
---- renamed the asset from kotlin-native-<platform>-<version> to
---- kotlin-native-prebuilt-<platform>-<version>; the canonical name is the
---- one that carries a .sha256 file.
+--- URL of the Kotlin/Native prebuilt archive for a release. JetBrains renamed
+--- the asset from kotlin-native-<platform>-<version> to
+--- kotlin-native-prebuilt-<platform>-<version> in 2.0.0-Beta3, so Beta1 and
+--- Beta2 keep the old name. The canonical name is the one that carries a
+--- .sha256 file.
 --- @param version string Kotlin release
 --- @param osType string RUNTIME.osType
 --- @param archType string RUNTIME.archType
@@ -68,7 +69,7 @@ function util:NativeDownloadURL(version, osType, archType)
         return nil
     end
     local prefix = "kotlin-native-"
-    if self:compare_versions({ version = version }, { version = "2.0.0" }) or version == "2.0.0" then
+    if self:at_least(version, "2.0.0-Beta3") then
         prefix = "kotlin-native-prebuilt-"
     end
     return string.format(
@@ -81,18 +82,58 @@ function util:NativeDownloadURL(version, osType, archType)
     )
 end
 
-function util:compare_versions(v1o, v2o)
-    local v1 = v1o.version
-    local v2 = v2o.version
-    local v1_parts = {}
-    for part in string.gmatch(v1, "[^.]+") do
-        table.insert(v1_parts, tonumber(part))
-    end
+--- Whether a Kotlin version is the minimum or later, pre-releases included:
+--- 2.0.0-RC2 is at least 2.0.0-Beta3, and 1.9.0-Beta is not at least 1.9.0-RC.
+--- @param version string Kotlin release
+--- @param minimum string Lowest release that counts
+--- @return boolean
+function util:at_least(version, minimum)
+    return version == minimum or self:compare_versions({ version = version }, { version = minimum })
+end
 
-    local v2_parts = {}
-    for part in string.gmatch(v2, "[^.]+") do
-        table.insert(v2_parts, tonumber(part))
+--- Split a Kotlin version into its numeric parts and its pre-release tag:
+--- "2.0.0-RC2" gives {2, 0, 0} and "RC2", and "2.0.0" gives {2, 0, 0} and nil.
+--- @param version string Kotlin release
+--- @return table parts
+--- @return string|nil pre
+local function splitVersion(version)
+    local core, pre = string.match(version, "^([^-]+)%-(.+)$")
+    if core == nil then
+        core = version
     end
+    local parts = {}
+    for part in string.gmatch(core, "[^.]+") do
+        table.insert(parts, tonumber(part))
+    end
+    return parts, pre
+end
+
+--- Order two pre-release tags such as Beta4 and RC2 by their letters, then by
+--- the number after them: Beta4 < Beta5 < RC < RC2 < RC10.
+--- @param a string
+--- @param b string
+--- @return integer -1, 0 or 1
+local function comparePreRelease(a, b)
+    local aLetters, aNumber = string.match(a, "^(%D*)(%d*)")
+    local bLetters, bNumber = string.match(b, "^(%D*)(%d*)")
+    if aLetters ~= bLetters then
+        return aLetters < bLetters and -1 or 1
+    end
+    local aN, bN = tonumber(aNumber) or 0, tonumber(bNumber) or 0
+    if aN == bN then
+        return 0
+    end
+    return aN < bN and -1 or 1
+end
+
+--- Whether v1 comes after v2. The numeric parts decide first. A pre-release
+--- comes before its release, so 2.0.0-RC2 is after 2.0.0-Beta5 and before 2.0.0.
+--- @param v1o table {version = string}
+--- @param v2o table {version = string}
+--- @return boolean
+function util:compare_versions(v1o, v2o)
+    local v1_parts, v1_pre = splitVersion(v1o.version)
+    local v2_parts, v2_pre = splitVersion(v2o.version)
 
     for i = 1, math.max(#v1_parts, #v2_parts) do
         local v1_part = v1_parts[i] or 0
@@ -104,7 +145,10 @@ function util:compare_versions(v1o, v2o)
         end
     end
 
-    return false
+    if v1_pre == nil or v2_pre == nil then
+        return v1_pre == nil and v2_pre ~= nil
+    end
+    return comparePreRelease(v1_pre, v2_pre) > 0
 end
 
 return util

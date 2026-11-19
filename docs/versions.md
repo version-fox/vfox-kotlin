@@ -59,32 +59,32 @@ kotlinc-native hello.kt -o hello
 
 | Host | Native archive | From |
 | --- | --- | --- |
-| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0 |
+| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
 | Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0 |
-| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0 |
+| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
+| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0-Beta3 |
 | macOS x86_64 | `kotlin-native-macos-x86_64-<version>.tar.gz` | 1.9.0 |
 | macOS arm64 | `kotlin-native-macos-aarch64-<version>.tar.gz` | 1.9.0 |
-| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0 |
+| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0-Beta3 |
 | Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
 
-The archive name changed in Kotlin 2.0; the plugin chooses the canonical name
-for the release and verifies it against the `.sha256` file when JetBrains
-publishes one. Releases before 1.9.0 have no native archive and install the JVM
-compiler only. There is no prebuilt native compiler for Linux arm64, so those
-hosts also get the JVM compiler only. Bundling the native compiler requires
-vfox 1.0.0 or later.
+The archive name changed in Kotlin 2.0.0-Beta3; 2.0.0-Beta1 and 2.0.0-Beta2 keep
+the old name. The plugin chooses the canonical name for the release and verifies
+it against the `.sha256` file when JetBrains publishes one. Releases before 1.9.0
+have no native archive and install the JVM compiler only. There is no prebuilt
+native compiler for Linux arm64, so those hosts also get the JVM compiler only.
+Bundling the native compiler requires vfox 1.0.0 or later.
 
 Like `kotlinc`, `kotlinc-native` is a JVM launcher and needs Java on `PATH`.
 
 ## Checksums
 
-JetBrains publishes a `.sha256` file beside each compiler archive from 1.9.0 on.
-For those releases `PreInstall` returns the digest to vfox, so the install ends
-with `Verifying checksum …` and a download that does not match the file fails
-with `Checksum error`.
+JetBrains publishes a `.sha256` file beside each compiler archive from 1.9.0-RC
+on; 1.9.0-Beta has none. For those releases `PreInstall` returns the digest to
+vfox, so the install ends with `Verifying checksum …` and a download that does
+not match the file fails with `Checksum error`.
 
-Releases before 1.9.0 have no such asset. They still install, but vfox prints
+Releases before 1.9.0-RC have no such asset. They still install, but vfox prints
 `WARNING: Checksum is not provided, skip verify...`. This is expected; see
 [troubleshooting.md](troubleshooting.md) if an older release fails for another
 reason.

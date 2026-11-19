@@ -73,7 +73,8 @@ function PLUGIN:PreInstall(ctx)
         version = version,
         url = url,
     }
-    if util:compare_versions({ version = version }, { version = "1.9.0" }) or version == "1.9.0" then
+    -- JetBrains publishes a .sha256 from 1.9.0-RC on; 1.9.0-Beta has none.
+    if util:at_least(version, "1.9.0-RC") then
         resp, err = http.get({
             url = url .. ".sha256",
         })

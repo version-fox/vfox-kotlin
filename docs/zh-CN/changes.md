@@ -4,6 +4,10 @@
 
 每个版本的用户可感知变更。GitHub 发布页列出了拉取请求。
 
+## 未发布
+
+- Kotlin 2.0.0 的预发布版 `2.0.0-Beta3` 至 `2.0.0-RC3` 现在会安装 `kotlinc-native`。版本比较丢掉了预发布标签（如 `-RC2`），因此这些版本请求的是 2.0 之前的 Kotlin/Native 归档包名称，而 JetBrains 没有为它们发布该文件。现在比较会保留该标签。`1.9.0-RC` 也会校验其 `.sha256` 文件，此前它被跳过了。
+
 ## 0.1.4（2026-11-18）
 
 - 发布页无法读取时现在会报错：`Available` 抛出 `get Kotlin releases failed: HTTP <状态码>`（或连接错误），而不是列出空的版本列表，因此 `vfox search` 和 `vfox install kotlin@latest` 会说明原因。发布页未列出任何版本时，`latest` 也会给出明确的错误，而不再索引空列表。
