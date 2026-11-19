@@ -42,6 +42,19 @@ func TestCompareVersions(t *testing.T) {
 		{"1.8.22", "1.9.0", -1},
 		{"2.0.0", "1.99.99", 1},
 		{"1.9", "1.9.0", 0},
+		{"1.9.10", "1.9.9", 1},
+		// The same pre-release cases as tests/util_test.lua. A pre-release sorts
+		// below its release and above the earlier pre-releases.
+		{"2.0.0-RC2", "2.0.0", -1},
+		{"2.0.0", "2.0.0-RC2", 1},
+		{"2.0.0-RC2", "2.0.0-Beta5", 1},
+		{"2.0.0-Beta4", "2.0.0-Beta3", 1},
+		{"2.0.0-Beta2", "2.0.0-Beta3", -1},
+		{"2.0.0-RC10", "2.0.0-RC2", 1},
+		{"2.0.0-Beta3", "2.0.0-Beta3", 0},
+		{"1.9.0-Beta", "1.9.0-RC", -1},
+		{"1.9.0-RC", "1.9.0", -1},
+		{"2.0.1-Beta1", "2.0.0", 1},
 	}
 	for _, c := range cases {
 		assert.Equal(t, c.want, CompareVersions(c.a, c.b), "%s vs %s", c.a, c.b)
@@ -50,12 +63,18 @@ func TestCompareVersions(t *testing.T) {
 
 func TestHasChecksum(t *testing.T) {
 	assert.False(t, HasChecksum(LegacyVersion))
+	// 1.9.0-Beta has no .sha256 asset, so PreInstall returns no checksum for it.
+	assert.False(t, HasChecksum("1.9.0-Beta"))
+	assert.True(t, HasChecksum("1.9.0-RC"))
 	assert.True(t, HasChecksum("1.9.0"))
 	assert.True(t, HasChecksum(DefaultVersion))
 }
 
 func TestHasNative(t *testing.T) {
 	assert.False(t, HasNative(LegacyVersion, "amd64"))
+	// The 1.9.0 pre-releases sort before 1.9.0 and are still checked.
+	assert.True(t, HasNative("1.9.0-Beta", "amd64"))
+	assert.True(t, HasNative("1.9.0-RC", "amd64"))
 	assert.True(t, HasNative("1.9.0", "amd64"))
 	assert.True(t, HasNative(DefaultVersion, "amd64"))
 	assert.False(t, HasNative(DefaultVersion, "arm64"), "no prebuilt native compiler for Linux arm64")

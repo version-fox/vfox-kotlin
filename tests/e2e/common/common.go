@@ -62,50 +62,122 @@ func Version() string {
 	return DefaultVersion
 }
 
-// HasChecksum mirrors PreInstall's version threshold: releases from 1.9.0 on
-// have a .sha256 asset on GitHub and are verified by vfox.
+// checksumFrom is the first release that PreInstall returns a checksum for:
+// JetBrains publishes a .sha256 asset from 1.9.0-RC on, and 1.9.0-Beta has none.
+const checksumFrom = "1.9.0-RC"
+
+// nativeFrom is the first release the suite checks kotlinc-native for. It is a
+// pre-release, not 1.9.0: a pre-release sorts before its release, so 1.9.0 alone
+// would leave out the 1.9.0 pre-releases, which have a native archive too.
+const nativeFrom = "1.9.0-Beta"
+
+// HasChecksum reports whether vfox verifies a checksum for version. It mirrors
+// the threshold in hooks/pre_install.lua.
 func HasChecksum(version string) bool {
-	return CompareVersions(version, "1.9.0") >= 0
+	return atLeast(version, checksumFrom)
 }
 
-// HasNative reports whether JetBrains publishes a Kotlin/Native archive for
-// the E2E target. Both suites run on amd64, where native builds exist from
-// 1.9.0 on; Linux arm64 has no prebuilt native compiler.
+// HasNative reports whether the suite checks kotlinc-native for version on the
+// E2E target, which is amd64 in both suites. Some older releases ship a native
+// archive too; the suite does not check them.
 func HasNative(version, arch string) bool {
-	return arch == "amd64" && CompareVersions(version, "1.9.0") >= 0
+	return arch == "amd64" && atLeast(version, nativeFrom)
 }
 
-// CompareVersions compares dot-separated numeric versions. Missing components
-// count as zero, as in lib/util.lua.
+// atLeast reports whether version is minimum or later, pre-releases included.
+// It mirrors util:at_least in lib/util.lua.
+func atLeast(version, minimum string) bool {
+	return version == minimum || CompareVersions(version, minimum) > 0
+}
+
+// CompareVersions orders two Kotlin releases as lib/util.lua does: the numeric
+// parts first, with missing parts counting as zero, then the pre-release tag.
+// A release sorts after its pre-releases, so 1.9.0-RC comes before 1.9.0. It
+// returns -1, 0 or 1.
 func CompareVersions(a, b string) int {
-	parse := func(v string) []int {
-		var parts []int
-		for _, s := range strings.Split(v, ".") {
-			n, err := strconv.Atoi(s)
-			if err != nil {
-				n = 0
-			}
-			parts = append(parts, n)
+	aParts, aPre, aHasPre := splitVersion(a)
+	bParts, bPre, bHasPre := splitVersion(b)
+	for i := range max(len(aParts), len(bParts)) {
+		if c := cmpInt(partAt(aParts, i), partAt(bParts, i)); c != 0 {
+			return c
 		}
-		return parts
 	}
-	x, y := parse(a), parse(b)
-	for i := 0; i < len(x) || i < len(y); i++ {
-		xi, yi := 0, 0
-		if i < len(x) {
-			xi = x[i]
+	switch {
+	case !aHasPre && !bHasPre:
+		return 0
+	case !aHasPre:
+		return 1
+	case !bHasPre:
+		return -1
+	default:
+		return comparePreRelease(aPre, bPre)
+	}
+}
+
+// splitVersion splits a release such as 2.0.0-RC2 into its numeric parts and
+// its pre-release tag, as lib/util.lua does.
+func splitVersion(version string) (parts []int, pre string, hasPre bool) {
+	core := version
+	if i := strings.Index(version, "-"); i > 0 && i < len(version)-1 {
+		core, pre, hasPre = version[:i], version[i+1:], true
+	}
+	for _, s := range strings.Split(core, ".") {
+		n, err := strconv.Atoi(s)
+		if err != nil {
+			n = 0
 		}
-		if i < len(y) {
-			yi = y[i]
-		}
-		if xi < yi {
+		parts = append(parts, n)
+	}
+	return parts, pre, hasPre
+}
+
+// comparePreRelease orders pre-release tags such as Beta4 and RC2 by their
+// letters, then by the number after them: Beta4 < Beta5 < RC < RC2 < RC10.
+func comparePreRelease(a, b string) int {
+	aLetters, aNumber := splitTag(a)
+	bLetters, bNumber := splitTag(b)
+	if aLetters != bLetters {
+		if aLetters < bLetters {
 			return -1
 		}
-		if xi > yi {
-			return 1
-		}
+		return 1
+	}
+	return cmpInt(aNumber, bNumber)
+}
+
+// splitTag splits a pre-release tag into the letters before its first digit
+// and the number that follows them, which is zero when there is none.
+func splitTag(tag string) (letters string, number int) {
+	i := 0
+	for i < len(tag) && (tag[i] < '0' || tag[i] > '9') {
+		i++
+	}
+	j := i
+	for j < len(tag) && tag[j] >= '0' && tag[j] <= '9' {
+		j++
+	}
+	number, _ = strconv.Atoi(tag[i:j]) // an empty number gives zero
+	return tag[:i], number
+}
+
+// partAt returns the i-th numeric part, or zero past the end of parts.
+func partAt(parts []int, i int) int {
+	if i < len(parts) {
+		return parts[i]
 	}
 	return 0
+}
+
+// cmpInt returns -1, 0 or 1 as a is less than, equal to or greater than b.
+func cmpInt(a, b int) int {
+	switch {
+	case a < b:
+		return -1
+	case a > b:
+		return 1
+	default:
+		return 0
+	}
 }
 
 // MaxJobs caps parallel containers; $E2E_MAX_JOBS overrides the default.

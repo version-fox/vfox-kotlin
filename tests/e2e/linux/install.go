@@ -26,8 +26,9 @@ import (
 )
 
 // installKotlin installs a release and asserts the plugin's two checksum
-// paths: releases from 1.9.0 on carry a .sha256 that vfox verifies, older
-// ones install with vfox's "checksum not provided" warning.
+// paths: releases from 1.9.0-RC on carry a .sha256 that vfox verifies, and
+// the others, such as 1.9.0-Beta and 1.8.22, install with vfox's "checksum not
+// provided" warning.
 func installKotlin(ctx context.Context, t *testing.T, ctr tc.Container, version string) string {
 	t.Helper()
 	command := fmt.Sprintf("vfox install kotlin@%s", version)

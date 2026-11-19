@@ -126,7 +126,7 @@ under test also runs steps 2 and 4 to 7:
    is on `PATH`, `vfox env` exports it, `kotlinc -version` and
    `kotlin -version` report the requested version, and `vfox current kotlin`
    names the selection.
-6. On amd64, for releases from 1.9.0 on, `kotlinc-native` is on `PATH` and
+6. On amd64, for releases from 1.9.0-Beta on, `kotlinc-native` is on `PATH` and
    `kotlinc-native -version` reports the same release.
 7. `vfox link --detect kotlin` finds a compiler copied outside vfox's own
    directories and pointed to by `KOTLIN_HOME`, links it, and the link shows up
