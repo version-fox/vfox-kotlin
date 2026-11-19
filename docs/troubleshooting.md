@@ -29,8 +29,8 @@ example with the [vfox-java](https://github.com/version-fox/vfox-java) plugin.
 
 ## `WARNING: Checksum is not provided, skip verify...`
 
-Kotlin releases before 1.9.0 have no `.sha256` asset on GitHub, so vfox cannot
-verify them. The install still succeeds. From 1.9.0 on, a successful install
+Kotlin releases before 1.9.0-RC have no `.sha256` asset on GitHub, so vfox cannot
+verify them. The install still succeeds. From 1.9.0-RC on, a successful install
 prints `Verifying checksum …` instead; see [versions.md](versions.md#checksums).
 
 ## `Checksum error`
@@ -48,7 +48,7 @@ kotlin@<version>` shows the request vfox made.
 
 ## `Current version checksum not detected.`
 
-From 1.9.0 on, `PreInstall` also downloads the `.sha256` file that JetBrains
+From 1.9.0-RC on, `PreInstall` also downloads the `.sha256` file that JetBrains
 publishes beside each archive. If that download fails, the install stops with
 this message. A network problem or a proxy that blocks GitHub is the usual
 cause; retry, or use `vfox --debug install kotlin@<version>` to see the request.

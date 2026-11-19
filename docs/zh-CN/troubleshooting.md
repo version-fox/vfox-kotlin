@@ -26,8 +26,8 @@ arm64 版本）。如果 `kotlinc` 可用但 `kotlinc-native` 不可用，请用
 
 ## `WARNING: Checksum is not provided, skip verify...`
 
-1.9.0 之前的 Kotlin 版本在 GitHub 上没有 `.sha256` 文件，因此 vfox 无法校验。
-安装仍会成功。从 1.9.0 起，安装成功时会显示 `Verifying checksum …`；
+1.9.0-RC 之前的 Kotlin 版本在 GitHub 上没有 `.sha256` 文件，因此 vfox 无法校验。
+安装仍会成功。从 1.9.0-RC 起，安装成功时会显示 `Verifying checksum …`；
 详见[版本](versions.md#校验和)。
 
 ## `Checksum error`
@@ -43,7 +43,7 @@ arm64 版本）。如果 `kotlinc` 可用但 `kotlinc-native` 不可用，请用
 
 ## `Current version checksum not detected.`
 
-从 1.9.0 起，`PreInstall` 还会下载 JetBrains 在每个归档包旁发布的 `.sha256` 文件。下载失败时
+从 1.9.0-RC 起，`PreInstall` 还会下载 JetBrains 在每个归档包旁发布的 `.sha256` 文件。下载失败时
 安装会以此错误停止。通常是网络问题，或代理拦截了 GitHub 的访问；请重试，或用
 `vfox --debug install kotlin@<version>` 查看请求。
 

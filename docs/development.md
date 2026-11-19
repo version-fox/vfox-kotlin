@@ -51,9 +51,10 @@ vfox loads `metadata.lua`, calls a hook when a command needs it, and puts
   empty list.
 - `PreInstall` formats `lib/util.lua`'s URL with the version twice. It sends a
   HEAD request and raises `Current version information not detected.` unless
-  the answer is 200. For a version at or above 1.9.0 it GETs `<url>.sha256` and
-  returns its body as `sha256`, raising `Current version checksum not detected.`
-  if that fails; otherwise it returns no checksum. `version` in
+  the answer is 200. For a version at or above 1.9.0-RC it GETs `<url>.sha256`
+  and returns its body as `sha256`, raising `Current version checksum not detected.`
+  if that fails; otherwise it returns no checksum. 1.9.0-Beta is below 1.9.0-RC,
+  and JetBrains publishes no checksum for it. `version` in
   the result is the name vfox installs under, which is why `latest` is resolved
   to a concrete release here; when the list is empty, `latest` raises
   `No Kotlin release is listed, so latest cannot be resolved.` It also probes

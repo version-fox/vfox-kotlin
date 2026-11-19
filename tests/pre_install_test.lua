@@ -41,6 +41,10 @@ local function answer(request)
         return { status_code = 200, body = "" }
     end
     if url:sub(-#".sha256") == ".sha256" then
+        -- 1.9.0-Beta is the one pre-release in this fixture with no checksum asset.
+        if url:find("1.9.0-Beta", 1, true) then
+            return { status_code = 404, body = "Not Found" }
+        end
         if url:find("2.0.0", 1, true) or url:find("1.9.0", 1, true) then
             return { status_code = 200, body = sha256 }
         end
@@ -116,6 +120,51 @@ end
 check("2.0.0", true)
 check("1.9.0", true)
 check("1.8.22", false)
+
+-- Pre-releases at the boundaries JetBrains changed. 1.9.0-Beta has no .sha256,
+-- so it must install without asking for one; 1.9.0-RC has one and is verified.
+-- 2.0.0-Beta2 still uses the pre-2.0 native archive name, Beta3 the new one.
+local function checkPreRelease(version, wantChecksum, wantNativeUrl)
+    requests = {}
+    local result = plugin:PreInstall({ version = version })
+    assert(result.version == version, version .. ": unexpected installed version " .. tostring(result.version))
+    assert(result.url == urlFor(version), version .. ": unexpected URL " .. tostring(result.url))
+    if wantChecksum then
+        assert(result.sha256 == sha256, version .. ": expected the .sha256 body")
+        assert(countCompilerChecksums() == 1, version .. ": the compiler checksum file must be fetched")
+    else
+        assert(result.sha256 == nil, version .. ": no checksum should be returned")
+        assert(countCompilerChecksums() == 0, version .. ": no compiler checksum request")
+    end
+    if wantNativeUrl ~= nil then
+        assert(result.addition ~= nil and #result.addition == 1, version .. ": expected a native addition")
+        local got = result.addition[1].url
+        assert(got == wantNativeUrl, version .. ": unexpected native URL " .. tostring(got))
+    end
+    cases = cases + 1
+end
+
+checkPreRelease("1.9.0-Beta", false, nil)
+checkPreRelease(
+    "1.9.0-RC",
+    true,
+    "https://github.com/JetBrains/kotlin/releases/download/v1.9.0-RC/kotlin-native-linux-x86_64-1.9.0-RC.tar.gz"
+)
+checkPreRelease(
+    "2.0.0-Beta2",
+    true,
+    "https://github.com/JetBrains/kotlin/releases/download/v2.0.0-Beta2/kotlin-native-linux-x86_64-2.0.0-Beta2.tar.gz"
+)
+checkPreRelease(
+    "2.0.0-Beta3",
+    true,
+    "https://github.com/JetBrains/kotlin/releases/download/v2.0.0-Beta3/kotlin-native-prebuilt-linux-x86_64-2.0.0-Beta3.tar.gz"
+)
+checkPreRelease(
+    "2.0.0-RC2",
+    true,
+    "https://github.com/JetBrains/kotlin/releases/download/v2.0.0-RC2/kotlin-native-prebuilt-linux-x86_64-2.0.0-RC2.tar.gz"
+)
 
 -- `latest` resolves through Available to the first listed release.
 requests = {}

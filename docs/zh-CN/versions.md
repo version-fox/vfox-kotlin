@@ -54,17 +54,17 @@ kotlinc-native hello.kt -o hello
 
 | 主机 | 原生归档包 | 起始版本 |
 | --- | --- | --- |
-| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0 |
+| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
 | Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0 |
-| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0 |
+| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
+| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0-Beta3 |
 | macOS x86_64 | `kotlin-native-macos-x86_64-<version>.tar.gz` | 1.9.0 |
 | macOS arm64 | `kotlin-native-macos-aarch64-<version>.tar.gz` | 1.9.0 |
-| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0 |
+| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0-Beta3 |
 | Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
 
-Kotlin 2.0 更改了归档包名称，插件会按版本选择规范名称，并在 JetBrains 提供 `.sha256`
-时用它校验。1.9.0 之前的版本没有原生归档包，只会安装 JVM 编译器。Linux arm64 没有
+Kotlin 2.0.0-Beta3 更改了归档包名称（2.0.0-Beta1 和 2.0.0-Beta2 仍使用旧名称），插件会按版本选择
+规范名称，并在 JetBrains 提供 `.sha256` 时用它校验。1.9.0 之前的版本没有原生归档包，只会安装 JVM 编译器。Linux arm64 没有
 预编译的原生编译器，这些主机同样只安装 JVM 编译器。附带原生编译器需要 vfox 1.0.0
 或更新版本。
 
@@ -72,11 +72,11 @@ Kotlin 2.0 更改了归档包名称，插件会按版本选择规范名称，并
 
 ## 校验和
 
-从 1.9.0 起，JetBrains 会在每个编译器归档包旁发布 `.sha256` 文件。这些版本的
+从 1.9.0-RC 起，JetBrains 会在每个编译器归档包旁发布 `.sha256` 文件（1.9.0-Beta 没有）。这些版本的
 `PreInstall` 会把摘要交给 vfox，因此安装会显示 `Verifying checksum …`，下载与文件
 不匹配时会以 `Checksum error` 失败。
 
-1.9.0 之前的版本没有该文件。它们仍能安装，但 vfox 会打印
+1.9.0-RC 之前的版本没有该文件。它们仍能安装，但 vfox 会打印
 `WARNING: Checksum is not provided, skip verify...`。这是预期行为；若旧版本因其他
 原因安装失败，参见[疑难解答](troubleshooting.md)。
 

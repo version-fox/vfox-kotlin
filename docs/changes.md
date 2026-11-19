@@ -4,6 +4,10 @@
 
 What changed in each release. GitHub's release pages list the pull requests.
 
+## Unreleased
+
+- Pre-releases from `2.0.0-Beta3` to `2.0.0-RC3` now install `kotlinc-native`. The version comparison dropped the pre-release tag, such as `-RC2`, so they asked for the pre-2.0 Kotlin/Native archive name, which JetBrains does not publish for them. The comparison now keeps the tag. `1.9.0-RC` also verifies its `.sha256` file, which was skipped before.
+
 ## 0.1.4 (2026-11-18)
 
 - A releases page that cannot be read is now reported as an error: `Available` raises `get Kotlin releases failed: HTTP <status>` (or the connection error) instead of listing no versions, so `vfox search` and `vfox install kotlin@latest` say why. `latest` also stops with a clear message when the page lists no release, instead of indexing an empty list.
