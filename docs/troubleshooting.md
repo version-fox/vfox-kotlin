@@ -15,11 +15,11 @@ variables are exported with `vfox env -s bash` (or your shell).
 
 Kotlin/Native is a separate release asset and is only bundled when JetBrains
 publishes a prebuilt compiler for your host (Linux x86_64, macOS x86_64/arm64
-and Windows x86_64 from 1.9.0 on; there is no Linux arm64 build). If `kotlinc`
-works but `kotlinc-native` does not, check `vfox --version`: bundling needs vfox
-1.0.0 or later, so upgrade and reinstall the release. Versions before 1.9.0
-have no Kotlin/Native archive at all; see [versions.md](versions.md#kotlinnative)
-for the full platform list.
+and Windows x86_64; there is no Linux arm64 build). If `kotlinc` works but
+`kotlinc-native` does not, check `vfox --version`: bundling needs vfox 1.0.0 or
+later, so upgrade and reinstall the release. A release without a native archive
+for your host installs `kotlinc` only; see [versions.md](versions.md#kotlinnative)
+for the archive names and which releases have one.
 
 ## `java: command not found` when running kotlinc
 

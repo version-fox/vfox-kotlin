@@ -52,21 +52,14 @@ kotlinc-native -version
 kotlinc-native hello.kt -o hello
 ```
 
-| 主机 | 原生归档包 | 起始版本 |
+| 主机 | 2.0.0-Beta3 及以后 | 更早的版本 |
 | --- | --- | --- |
-| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
-| Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
-| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0-Beta3 |
-| macOS x86_64 | `kotlin-native-macos-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS arm64 | `kotlin-native-macos-aarch64-<version>.tar.gz` | 1.9.0 |
-| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0-Beta3 |
-| Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
+| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | `kotlin-native-linux-x86_64-<version>.tar.gz` |
+| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | `kotlin-native-macos-x86_64-<version>.tar.gz` |
+| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | `kotlin-native-macos-aarch64-<version>.tar.gz` |
+| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | `kotlin-native-windows-x86_64-<version>.zip` |
 
-Kotlin 2.0.0-Beta3 更改了归档包名称（2.0.0-Beta1 和 2.0.0-Beta2 仍使用旧名称），插件会按版本选择
-规范名称，并在 JetBrains 提供 `.sha256` 时用它校验。1.9.0 之前的版本没有原生归档包，只会安装 JVM 编译器。Linux arm64 没有
-预编译的原生编译器，这些主机同样只安装 JVM 编译器。附带原生编译器需要 vfox 1.0.0
-或更新版本。
+从 2.0.0-Beta3 起，归档包名称带有 `prebuilt` 段。2.0.0-Beta1 和 2.0.0-Beta2 以及更早的版本仍使用旧名称。插件会为每个版本查找对应的归档包，找到即安装，并在 JetBrains 提供 `.sha256` 时用它校验。并非每个版本都有：1.8.22 有，但插件在 Linux x86_64 上找不到 1.5.20 的归档包。没有归档包的版本只会安装 JVM 编译器；Linux arm64 没有预编译的原生编译器，这些主机同样只安装 JVM 编译器。附带原生编译器需要 vfox 1.0.0 或更新版本。
 
 和 `kotlinc` 一样，`kotlinc-native` 也是 JVM 启动脚本，需要 `PATH` 上有 Java。
 

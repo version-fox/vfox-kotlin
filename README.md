@@ -6,7 +6,7 @@ Kotlin plugin for [vfox](https://vfox.dev/).
 
 It installs the Kotlin compiler from [JetBrains' releases](https://github.com/JetBrains/kotlin/releases)
 onto your `PATH`, together with Kotlin/Native (`kotlinc-native`) when JetBrains
-publishes a prebuilt native compiler for your platform. Releases from 1.9.0 on
+publishes a prebuilt native compiler for your platform. Releases from 1.9.0-RC on
 are verified against the `.sha256` files JetBrains publishes beside the archives.
 
 ## Install
@@ -40,14 +40,14 @@ vfox use --global kotlin@2.1.0 # every new shell
 ```
 
 See [versions.md](docs/versions.md) for details, including the checksum
-behaviour of releases before 1.9.0.
+behaviour of releases before 1.9.0-RC.
 
 ## Kotlin/Native
 
-Kotlin/Native ships as a separate release asset. For releases from 1.9.0 on,
-the plugin downloads the prebuilt compiler for Linux x86_64, macOS x86_64/arm64
-or Windows x86_64 and puts its `bin` directory on `PATH` next to the JVM
-compiler:
+Kotlin/Native ships as a separate release asset. When JetBrains publishes a
+prebuilt compiler for a release, the plugin downloads it for Linux x86_64,
+macOS x86_64/arm64 or Windows x86_64 and puts its `bin` directory on `PATH`
+next to the JVM compiler:
 
 ```bash
 kotlinc-native -version
@@ -96,18 +96,9 @@ See [link.md](docs/link.md).
 
 ## Releasing this plugin
 
-Maintainers can publish from **Actions → Plugin → Run workflow** on the default
-branch by entering a stable plugin version without the `v` prefix. The shared
-workflow updates `metadata.lua`, creates the version commit and tag, and publishes
-the ZIP and manifest in this repository. No local tag or extra release token is
-needed. Pull requests run checks only.
-
-Existing version-tag pushes are supported when `PLUGIN.version` already matches
-the tag. If publication fails, re-run the original failed job to resume it.
-
-The workflow follows the shared `@v1` release-tool version. Updating the tool does
-not release this plugin. See the [shared workflow documentation](https://github.com/version-fox/plugin-manifest-action)
-for the package contract and first-rollout requirements.
+Maintainers publish from **Actions → Plugin → Run workflow** on the default
+branch. The release steps, version-tag pushes and failure recovery are described
+in [development.md](docs/development.md#releasing).
 
 ## License
 

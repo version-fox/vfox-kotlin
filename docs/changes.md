@@ -4,7 +4,7 @@
 
 What changed in each release. GitHub's release pages list the pull requests.
 
-## Unreleased
+## 0.1.5 (2026-11-19)
 
 - Pre-releases from `2.0.0-Beta3` to `2.0.0-RC3` now install `kotlinc-native`. The version comparison dropped the pre-release tag, such as `-RC2`, so they asked for the pre-2.0 Kotlin/Native archive name, which JetBrains does not publish for them. The comparison now keeps the tag. `1.9.0-RC` also verifies its `.sha256` file, which was skipped before.
 
