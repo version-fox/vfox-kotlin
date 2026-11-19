@@ -11,14 +11,14 @@ CI 在标准 runner 上原生运行（Docker 加上 `actions/setup-go` 安装的
 
 | 变量                 | 默认值   | 含义                                                     |
 | -------------------- | -------- | -------------------------------------------------------- |
-| `KOTLIN_VERSION`     | `2.0.0`  | 被测版本，它的用例执行全部步骤（1.9.0 起带校验和）         |
+| `KOTLIN_VERSION`     | `2.0.0`  | 被测版本，它的用例执行全部步骤（1.9.0-RC 起带校验和）         |
 | `E2E_MAX_JOBS`       | `3`      | 一次 `go test` 运行中同时运行的容器（用例）数              |
 | `E2E_RETRY_ATTEMPTS` | `3`      | 每个涉及网络的步骤的重试次数（线性退避 10 秒）            |
 
 每个平台运行两个用例，各自一个容器：
 
 - 被测版本（`KOTLIN_VERSION`）执行下文的全部步骤；
-- `1.8.22`（最后一个早于 `.sha256` 资产的版本）只执行步骤 1 和 3。若它本身就是被测版本，则不单独运行。
+- `1.8.22`（最后一个没有 `.sha256` 资产的稳定版本）只执行步骤 1 和 3。若它本身就是被测版本，则不单独运行。
 
 默认 `E2E_MAX_JOBS=3` 时两个用例同时运行；`E2E_MAX_JOBS=1` 则依次运行。
 
@@ -109,14 +109,14 @@ docker run --rm -v "$PWD:/work" -w /work apache/skywalking-eyes:0.9.0 header fix
 1. 从经过校验和检查的固定归档安装 vfox，并从本仓库注册本地 `kotlin` 插件——不是
    从插件注册表。
 2. `vfox search kotlin` 列出已安装的版本。
-3. `vfox install kotlin@<version>` 以该名称安装。1.9.0 及以上版本，vfox 会打印
-   `Verifying checksum <64 位十六进制>…`；较旧版本则报告未提供校验和。2.0.0 覆盖
-   前一种情况，1.8.22 覆盖后一种情况。
+3. `vfox install kotlin@<version>` 以该名称安装。1.9.0-RC 及以上版本，vfox 会打印
+   `Verifying checksum <64 位十六进制>…`；1.8.22、1.9.0-Beta 等其他版本则报告未提供校验和。
+   2.0.0 覆盖前一种情况，1.8.22 覆盖后一种情况。
 4. 安装 JetBrains 从未发布的版本会在 `PreInstall` 的 HEAD 检查中失败。
 5. `vfox use --global` 选中编译器。在新的 shell 中，SDK 的 `bin` 位于 `PATH` 中，
    `vfox env` 导出它，`kotlinc -version` 和 `kotlin -version` 报告请求的版本，
    `vfox current kotlin` 给出选中的版本。
-6. 在 amd64 上，对 1.9.0 及以上的版本，`kotlinc-native` 位于 `PATH` 中，并且
+6. 在 amd64 上，对 1.9.0-Beta 及以上的版本，`kotlinc-native` 位于 `PATH` 中，并且
    `kotlinc-native -version` 报告相同的版本。
 7. `vfox link --detect kotlin` 找到被复制到 vfox 目录之外并由 `KOTLIN_HOME` 指向的
    编译器，将其纳入，链接会出现在 `vfox list kotlin` 中并标为 `(linked → …)`。

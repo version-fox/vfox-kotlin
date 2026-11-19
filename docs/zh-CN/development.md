@@ -25,6 +25,9 @@ stylua.toml, .luarc.json        Lua 格式化和语言服务器配置
 .licenserc.yaml, .license.tpl   Apache-2.0 头部检查及其文本模板
 .devcontainer/                  E2E 套件的 Linux 开发环境
 .github/workflows/              CI：发布、测试、lint、许可证和 E2E
+LICENSE                         Apache-2.0 许可证文本
+.gitattributes, .gitignore,     Git 属性和忽略规则
+.dockerignore                   Docker 构建上下文的排除规则
 ```
 
 vfox 加载 `metadata.lua`，在命令需要时调用 hook，并把 `PLUGIN` 和 `RUNTIME`
@@ -114,8 +117,8 @@ lint、格式化、许可证头部和容器测试命令见
 
 当 `PLUGIN.version` 与标签一致时，推送版本标签也可以发布。若发布失败，重新运行
 失败的 job 即可续跑。工作流使用共享的 `@v1` 发布工具，更新该工具不会发布本插件。
-之后 [vfox-plugins](https://github.com/version-fox/vfox-plugins) 中的
-`plugins/kotlin.json` 会显示 `vfox add kotlin` 提供的版本。
+之后，公共注册表会在下一次定时同步时更新；随后 [vfox-plugins](https://github.com/version-fox/vfox-plugins)
+中的 `plugins/kotlin.json` 会显示 `vfox add kotlin` 提供的版本。
 
 ### 发布之后
 

@@ -12,14 +12,14 @@ the stock runners (Docker plus Go from `actions/setup-go`). The dev container in
 
 | Variable              | Default  | Meaning                                                     |
 | --------------------- | -------- | ----------------------------------------------------------- |
-| `KOTLIN_VERSION`      | `2.0.0`  | Release under test; its case runs every step (from 1.9.0 on, with checksum) |
+| `KOTLIN_VERSION`      | `2.0.0`  | Release under test; its case runs every step (with checksum from 1.9.0-RC on) |
 | `E2E_MAX_JOBS`        | `3`      | Containers (cases) that run at once in one `go test` run    |
 | `E2E_RETRY_ATTEMPTS`  | `3`      | Attempts per network-touching step (10s linear backoff)      |
 
 Each platform runs two cases, one container each:
 
 - the release under test (`KOTLIN_VERSION`) runs every step below;
-- `1.8.22`, the last release before the `.sha256` assets, runs steps 1 and 3 only.
+- `1.8.22`, the last stable release without a `.sha256` asset, runs steps 1 and 3 only.
   It gets no case of its own when it is the release under test.
 
 With the default `E2E_MAX_JOBS=3` both cases run at once. `E2E_MAX_JOBS=1` runs
@@ -116,17 +116,17 @@ under test also runs steps 2 and 4 to 7:
 1. vfox is installed from a pinned, checksum-checked archive and the local
    `kotlin` plugin is registered from this checkout — not from the registry.
 2. `vfox search kotlin` lists the installed release.
-3. `vfox install kotlin@<version>` installs under that exact name. For 1.9.0
-   and newer, vfox prints `Verifying checksum <64 hex digits>…`; for older
-   releases it reports that no checksum is provided. 2.0.0 covers the first
-   branch and 1.8.22 the second.
+3. `vfox install kotlin@<version>` installs under that exact name. For 1.9.0-RC
+   and newer, vfox prints `Verifying checksum <64 hex digits>…`; for the others,
+   such as 1.8.22 and 1.9.0-Beta, it reports that no checksum is provided. 2.0.0
+   covers the first branch and 1.8.22 the second.
 4. Installing a release JetBrains never published fails in `PreInstall`'s HEAD
    check.
 5. `vfox use --global` selects the compiler. In a fresh shell the SDK's `bin`
    is on `PATH`, `vfox env` exports it, `kotlinc -version` and
    `kotlin -version` report the requested version, and `vfox current kotlin`
    names the selection.
-6. On amd64, for releases from 1.9.0 on, `kotlinc-native` is on `PATH` and
+6. On amd64, for releases from 1.9.0-Beta on, `kotlinc-native` is on `PATH` and
    `kotlinc-native -version` reports the same release.
 7. `vfox link --detect kotlin` finds a compiler copied outside vfox's own
    directories and pointed to by `KOTLIN_HOME`, links it, and the link shows up

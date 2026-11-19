@@ -24,12 +24,12 @@ vfox link --detect -y kotlin
 
 - SDKMAN（`~/.sdkman/candidates/kotlin`）、asdf 和 mise 的安装目录
 - Homebrew 和 Linuxbrew 的 keg，以及系统目录
-  （`/usr/share/kotlinc`、`/opt`、`/usr/local`）
+  （`/usr/share/kotlinc`、`/opt/kotlinc`、`/usr/local/kotlinc`，以及 `/opt` 和 `/usr/local` 下的第一层目录）
 - IntelliJ IDEA 和 JetBrains Toolbox 自带的编译器，位于 `plugins/kotlin/kotlinc`
 - Scoop 应用，以及 Windows 上 `Program Files` 和 `USERPROFILE` 下的常见位置
 - `KOTLIN_HOME` 指向的路径
 
-vfox 自己目录下的路径永远不会被提供，因此已由 vfox 安装的编译器不会被重复检测。
+路径中含有 `.vfox` 目录（vfox 保存安装内容的地方）的编译器永远不会被提供，因此已由 vfox 安装的编译器不会被重复检测。
 
 ## 版本命名
 

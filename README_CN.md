@@ -6,7 +6,7 @@
 
 它从 [JetBrains 的发布页](https://github.com/JetBrains/kotlin/releases) 安装
 Kotlin 编译器并加入 `PATH`；当 JetBrains 为你的平台提供预编译包时，也会一并安装
-Kotlin/Native（`kotlinc-native`）。从 1.9.0 起，安装时会用 JetBrains 同时发布的
+Kotlin/Native（`kotlinc-native`）。从 1.9.0-RC 起，安装时会用 JetBrains 同时发布的
 `.sha256` 文件校验下载。
 
 ## 安装
@@ -36,13 +36,13 @@ vfox use kotlin@2.1.0          # 仅当前 shell 会话
 vfox use --global kotlin@2.1.0 # 所有新 shell
 ```
 
-详见 [versions.md](docs/zh-CN/versions.md)，包括 1.9.0 之前版本的校验行为。
+详见 [versions.md](docs/zh-CN/versions.md)，包括 1.9.0-RC 之前版本的校验行为。
 
 ## Kotlin/Native
 
-Kotlin/Native 作为单独的发布资源提供。从 1.9.0 起，插件会下载适用于 Linux x86_64、
-macOS x86_64/arm64 或 Windows x86_64 的预编译编译器，并把它的 `bin` 目录与 JVM 编译器
-一起加入 `PATH`：
+Kotlin/Native 作为单独的发布资源提供。JetBrains 为某个版本发布预编译编译器时，插件会下载
+适用于 Linux x86_64、macOS x86_64/arm64 或 Windows x86_64 的版本，并把它的 `bin` 目录与
+JVM 编译器一起加入 `PATH`：
 
 ```bash
 kotlinc-native -version
@@ -88,15 +88,8 @@ vfox link --detect kotlin
 
 ## 发布插件
 
-维护者可以在默认分支上从 **Actions → Plugin → Run workflow** 发布，填入不带 `v`
-前缀的稳定版本号。共享工作流会更新 `metadata.lua`、创建版本提交和标签，并在本仓库
-发布 ZIP 和 manifest。无需本地打标签或额外的 release token。拉取请求只运行检查。
-
-当 `PLUGIN.version` 与标签一致时，推送版本标签也可以发布。若发布失败，重新运行
-原来失败的 job 即可续跑。
-
-工作流使用共享的 `@v1` 发布工具版本。更新该工具不会发布本插件。包结构和首次发布
-要求见[共享工作流文档](https://github.com/version-fox/plugin-manifest-action)。
+维护者可以在默认分支上从 **Actions → Plugin → Run workflow** 发布。发布步骤、版本标签推送
+和失败后的续跑方法见[开发文档](docs/zh-CN/development.md#发布)。
 
 ## 许可证
 

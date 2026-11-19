@@ -57,23 +57,21 @@ kotlinc-native -version
 kotlinc-native hello.kt -o hello
 ```
 
-| Host | Native archive | From |
+| Host | From 2.0.0-Beta3 on | Earlier releases |
 | --- | --- | --- |
-| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
-| Linux x86_64 | `kotlin-native-linux-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | 2.0.0-Beta3 |
-| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | 2.0.0-Beta3 |
-| macOS x86_64 | `kotlin-native-macos-x86_64-<version>.tar.gz` | 1.9.0 |
-| macOS arm64 | `kotlin-native-macos-aarch64-<version>.tar.gz` | 1.9.0 |
-| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | 2.0.0-Beta3 |
-| Windows x86_64 | `kotlin-native-windows-x86_64-<version>.zip` | 1.9.0 |
+| Linux x86_64 | `kotlin-native-prebuilt-linux-x86_64-<version>.tar.gz` | `kotlin-native-linux-x86_64-<version>.tar.gz` |
+| macOS x86_64 | `kotlin-native-prebuilt-macos-x86_64-<version>.tar.gz` | `kotlin-native-macos-x86_64-<version>.tar.gz` |
+| macOS arm64 | `kotlin-native-prebuilt-macos-aarch64-<version>.tar.gz` | `kotlin-native-macos-aarch64-<version>.tar.gz` |
+| Windows x86_64 | `kotlin-native-prebuilt-windows-x86_64-<version>.zip` | `kotlin-native-windows-x86_64-<version>.zip` |
 
 The archive name changed in Kotlin 2.0.0-Beta3; 2.0.0-Beta1 and 2.0.0-Beta2 keep
-the old name. The plugin chooses the canonical name for the release and verifies
-it against the `.sha256` file when JetBrains publishes one. Releases before 1.9.0
-have no native archive and install the JVM compiler only. There is no prebuilt
-native compiler for Linux arm64, so those hosts also get the JVM compiler only.
-Bundling the native compiler requires vfox 1.0.0 or later.
+the old name, as do all earlier releases. The plugin looks for the archive of
+each release and verifies it against its `.sha256` file when JetBrains publishes
+one. Not every release has one: 1.8.22 does, but the plugin finds none for 1.5.20
+on Linux x86_64.
+A release without one installs the JVM compiler only. There is no prebuilt native
+compiler for Linux arm64, so those hosts also get the JVM compiler only. Bundling
+the native compiler requires vfox 1.0.0 or later.
 
 Like `kotlinc`, `kotlinc-native` is a JVM launcher and needs Java on `PATH`.
 

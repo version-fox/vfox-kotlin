@@ -27,15 +27,16 @@ link, leaving the compiler where it is.
 
 - SDKMAN (`~/.sdkman/candidates/kotlin`), asdf and mise installs
 - Homebrew and Linuxbrew kegs, and the system directories
-  (`/usr/share/kotlinc`, `/opt`, `/usr/local`)
+  (`/usr/share/kotlinc`, `/opt/kotlinc`, `/usr/local/kotlinc`, and the folders
+  directly under `/opt` and `/usr/local`)
 - IntelliJ IDEA and JetBrains Toolbox bundles, which keep the compiler under
   `plugins/kotlin/kotlinc`
 - Scoop apps and the usual Windows locations under `Program Files` and
   `USERPROFILE`
 - The path pointed to by `KOTLIN_HOME`
 
-Paths under vfox's own directories are never offered, so a compiler vfox
-already installed is not detected again.
+Paths under a `.vfox` directory, where vfox keeps its installs, are never
+offered, so a compiler vfox already installed is not detected again.
 
 ## Version names
 

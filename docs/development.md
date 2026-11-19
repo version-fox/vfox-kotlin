@@ -26,6 +26,9 @@ stylua.toml, .luarc.json        Lua formatting and language-server settings
 .licenserc.yaml, .license.tpl   Apache-2.0 header check and its text template
 .devcontainer/                  Linux development environment for the E2E suite
 .github/workflows/              CI: publish, test, lint, license and E2E
+LICENSE                         Apache-2.0 license text
+.gitattributes, .gitignore,     Git attributes and ignore rules
+.dockerignore                   Docker build context exclusions
 ```
 
 vfox loads `metadata.lua`, calls a hook when a command needs it, and puts
@@ -130,7 +133,8 @@ token is needed. Pull requests run the checks only.
 Pushing a version tag publishes too, when `PLUGIN.version` already matches the
 tag. If publication fails, re-run the failed job to resume it. The workflow
 follows the shared `@v1` release tool, and updating the tool does not release
-this plugin. Afterwards `plugins/kotlin.json` in
+this plugin. The public registry picks a new version up on its next scheduled
+sync. After that, `plugins/kotlin.json` in
 [vfox-plugins](https://github.com/version-fox/vfox-plugins) shows the version
 that `vfox add kotlin` serves.
 

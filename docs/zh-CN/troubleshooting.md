@@ -12,11 +12,10 @@
 ## `kotlinc-native: command not found`
 
 Kotlin/Native 是单独的发布资源，只有当 JetBrains 为主机提供预编译编译器时才会附带
-（从 1.9.0 起支持 Linux x86_64、macOS x86_64/arm64 和 Windows x86_64；没有 Linux
-arm64 版本）。如果 `kotlinc` 可用但 `kotlinc-native` 不可用，请用 `vfox --version`
-检查版本：附带原生编译器需要 vfox 1.0.0 或更新版本，升级后请重新安装该版本。
-1.9.0 之前的版本根本没有 Kotlin/Native 归档包；完整平台列表见
-[versions.md](versions.md#kotlinnative)。
+（Linux x86_64、macOS x86_64/arm64 和 Windows x86_64；没有 Linux arm64 版本）。如果
+`kotlinc` 可用但 `kotlinc-native` 不可用，请用 `vfox --version` 检查版本：附带原生编译器
+需要 vfox 1.0.0 或更新版本，升级后请重新安装该版本。某个版本没有适合你主机的原生归档包时，
+只会安装 `kotlinc`；归档包名称和哪些版本有归档包，见[版本](versions.md#kotlinnative)。
 
 ## 运行 kotlinc 时出现 `java: command not found`
 
